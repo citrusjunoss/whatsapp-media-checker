@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   getLoadedErrorDataset,
   searchErrors,
@@ -10,7 +10,6 @@ import {
 import {
   Search,
   X,
-  Sparkles,
   ExternalLink,
   Copy,
   Check,
@@ -18,13 +17,11 @@ import {
   XCircle,
   Clock,
   ServerCrash,
-  ShieldAlert,
   ChevronDown,
   ChevronUp,
   RefreshCw,
-  BookOpen,
-  HelpCircle,
-  FileCode2,
+  FileCode,
+  Terminal,
 } from 'lucide-react';
 
 export const ErrorLookup: React.FC = () => {
@@ -33,6 +30,19 @@ export const ErrorLookup: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [expandedPayloads, setExpandedPayloads] = useState<Record<number, boolean>>({});
   const [copiedCode, setCopiedCode] = useState<number | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Keyboard shortcut '/' or '⌘K' to focus search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.key === '/' || ((e.metaKey || e.ctrlKey) && e.key === 'k')) && document.activeElement !== inputRef.current) {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const filteredErrors = useMemo(() => {
     return searchErrors(query, activeCategory, dataset.items);
@@ -46,17 +56,15 @@ export const ErrorLookup: React.FC = () => {
   };
 
   const handleCopyReport = (item: WhatsAppErrorItem) => {
-    const reportText = `[WhatsApp API 错误诊断报告]
-错误码 (Code): ${item.code}
-类别: ${item.categoryNameZh} (${item.category})
-标题: ${item.titleZh} / ${item.titleEn}
-原因与释义:
+    const reportText = `[WhatsApp API 错误诊断]
+Code: ${item.code} | HTTP ${item.httpStatus || 400}
+Category: ${item.categoryNameZh} (${item.category})
+Title: ${item.titleZh} / ${item.titleEn}
+Cause:
 ${item.detailsZh}
-官方英文说明:
-${item.detailsEn}
-解决方案:
+Resolution:
 ${item.solutionZh}
-官方文档: ${item.docUrl || 'https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes'}`;
+Doc: ${item.docUrl || 'https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes'}`;
 
     navigator.clipboard.writeText(reportText);
     setCopiedCode(item.code);
@@ -67,36 +75,35 @@ ${item.solutionZh}
     switch (severity) {
       case 'blocker':
         return (
-          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
-            <XCircle className="w-3 h-3 text-rose-600" />
-            <span>阻断性错误</span>
+          <span className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-rose-500/10 text-rose-500 border border-rose-500/20">
+            <XCircle className="w-3 h-3" />
+            <span>BLOCKER</span>
           </span>
         );
       case 'rate_limit':
         return (
-          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-            <Clock className="w-3 h-3 text-amber-600" />
-            <span>频率限制</span>
+          <span className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20">
+            <Clock className="w-3 h-3" />
+            <span>THROTTLED</span>
           </span>
         );
       case 'service_unavailable':
         return (
-          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
-            <ServerCrash className="w-3 h-3 text-purple-600" />
-            <span>服务维护/异常</span>
+          <span className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+            <ServerCrash className="w-3 h-3" />
+            <span>OUTAGE</span>
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-            <AlertTriangle className="w-3 h-3 text-blue-600" />
-            <span>客户端/参数错误</span>
+          <span className="inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <AlertTriangle className="w-3 h-3" />
+            <span>CLIENT_ERR</span>
           </span>
         );
     }
   };
 
-  // Format sync timestamp nicely
   const formattedSyncDate = useMemo(() => {
     try {
       const d = new Date(dataset.lastSyncedAt);
@@ -107,100 +114,107 @@ ${item.solutionZh}
   }, [dataset.lastSyncedAt]);
 
   return (
-    <div className="space-y-6">
-      {/* Search Header Banner */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-3xl space-y-4">
+    <div className="space-y-4">
+      {/* Precision Command Search Bar (Raycast / Linear Style) */}
+      <div className="app-surface rounded-lg border app-border p-3.5 space-y-3 transition-colors">
+        <div className="flex items-center justify-between text-xs app-text-muted">
           <div className="flex items-center space-x-2">
-            <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold border border-emerald-500/30">
-              WhatsApp Cloud API 官方错误库
-            </span>
-            <span className="text-xs text-slate-400">
-              共收录 {dataset.totalCount} 个错误码 · GitHub Action 自动同步
+            <Terminal className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="font-mono font-semibold app-text-main">Meta WhatsApp Cloud API Error Directory</span>
+            <span className="text-[11px] font-mono px-1.5 rounded app-surface-subtle border app-border app-text-dim">
+              {dataset.totalCount} entries
             </span>
           </div>
-
-          <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
-            WhatsApp API 错误代码秒级速查
-          </h2>
-
-          <p className="text-sm text-slate-300 leading-relaxed">
-            支持按数字代码（如 <code className="text-emerald-300 font-mono">131047</code>、<code className="text-emerald-300 font-mono">190</code>）、英文错误原句或中文关键词（如 <span className="text-emerald-300">24小时窗口</span>、<span className="text-emerald-300">限流</span>、<span className="text-emerald-300">模板变量</span>）即时模糊匹配，并提供官方标准解决方案。
-          </p>
-
-          {/* Search Input Box */}
-          <div className="relative pt-2">
-            <div className="relative flex items-center">
-              <Search className="w-5 h-5 text-slate-400 absolute left-4 pointer-events-none" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="搜索错误码、报错信息、英文或中文关键词 (例如: 131026, 24小时, template, token, undeliverable)..."
-                className="w-full pl-12 pr-10 py-3.5 bg-white text-slate-900 placeholder-slate-400 rounded-2xl text-sm font-medium shadow-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all"
-              />
-              {query && (
-                <button
-                  onClick={() => setQuery('')}
-                  className="absolute right-3.5 p-1 text-slate-400 hover:text-slate-600 rounded-lg"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Popular Error Quick Chips */}
-          <div className="flex flex-wrap items-center gap-2 pt-2">
-            <span className="text-xs text-slate-400 flex items-center space-x-1">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>常见高频错误：</span>
-            </span>
-            {POPULAR_ERROR_CODES.map((item) => (
-              <button
-                key={item.code}
-                onClick={() => setQuery(item.code.toString())}
-                className="px-2.5 py-1 text-xs rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 text-slate-200 hover:text-white transition-all border border-white/10 flex items-center space-x-1.5"
-              >
-                <span>{item.label}</span>
-              </button>
-            ))}
+          <div className="flex items-center space-x-2 text-[11px] font-mono app-text-dim hidden sm:flex">
+            <RefreshCw className="w-3 h-3" />
+            <span>Synced: {formattedSyncDate}</span>
           </div>
         </div>
-      </div>
 
-      {/* Category Pills & Metadata Row */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
-        {/* Category Tabs */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 sm:pb-0">
-          {ERROR_CATEGORIES.map((cat) => (
+        {/* Input Field with keyboard shortcut prompt */}
+        <div className="relative flex items-center">
+          <Search className="w-4 h-4 app-text-dim absolute left-3.5 pointer-events-none" />
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="搜索代码 (如 131047, 190) 或中英文关键词 (24小时, template, token, undeliverable)..."
+            className="w-full pl-9 pr-14 py-2 app-surface-subtle app-text-main placeholder:app-text-dim rounded-md text-xs font-mono border app-border focus:outline-none focus:border-emerald-500 transition-colors"
+          />
+          <div className="absolute right-3 flex items-center space-x-1.5">
+            {query ? (
+              <button
+                onClick={() => setQuery('')}
+                className="p-0.5 app-text-dim hover:app-text-main rounded"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono app-text-dim app-surface rounded border app-border">
+                /
+              </kbd>
+            )}
+          </div>
+        </div>
+
+        {/* Quick Filter Code Chips */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-xs">
+          <span className="text-[11px] font-mono app-text-dim mr-1">HOT:</span>
+          {POPULAR_ERROR_CODES.map((item) => (
             <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                activeCategory === cat.id
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200/80'
+              key={item.code}
+              onClick={() => setQuery(item.code.toString())}
+              className={`px-2 py-0.5 text-[11px] font-mono rounded border transition-all ${
+                query === item.code.toString()
+                  ? 'app-surface text-emerald-500 border-emerald-500/50 font-bold'
+                  : 'app-surface-subtle app-text-muted hover:app-text-main app-border'
               }`}
             >
-              <span>{cat.nameZh}</span>
+              <span>{item.code}</span>
+              <span className="app-text-dim ml-1 text-[10px]">
+                {item.label.split('·')[1]?.trim()}
+              </span>
             </button>
           ))}
         </div>
-
-        {/* Sync Status Badge */}
-        <div className="text-xs text-slate-500 flex items-center space-x-2 flex-shrink-0">
-          <RefreshCw className="w-3.5 h-3.5 text-emerald-600" />
-          <span>Meta 官方数据同步：{formattedSyncDate}</span>
-          <span className="px-1.5 py-0.2 bg-slate-100 rounded text-slate-600 font-mono text-[11px]">
-            {filteredErrors.length} / {dataset.totalCount} 条结果
-          </span>
-        </div>
       </div>
 
-      {/* Error Cards List */}
-      <div className="space-y-4">
+      {/* Category Pills Row */}
+      <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs">
+        {ERROR_CATEGORIES.map((cat) => (
+          <button
+            key={cat.id}
+            onClick={() => setActiveCategory(cat.id)}
+            className={`px-2.5 py-1 rounded text-xs font-medium font-mono whitespace-nowrap border transition-all ${
+              activeCategory === cat.id
+                ? 'app-surface app-text-main border-emerald-500/60 font-semibold'
+                : 'app-surface-subtle app-text-muted hover:app-text-main app-border'
+            }`}
+          >
+            <span>{cat.nameZh}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Results Header Count */}
+      <div className="flex items-center justify-between text-xs font-mono app-text-dim px-1">
+        <span>MATCHED: {filteredErrors.length} / {dataset.totalCount} CODES</span>
+        {query && (
+          <button
+            onClick={() => {
+              setQuery('');
+              setActiveCategory('all');
+            }}
+            className="text-emerald-500 hover:underline"
+          >
+            RESET_FILTER
+          </button>
+        )}
+      </div>
+
+      {/* Error Items List */}
+      <div className="space-y-3">
         {filteredErrors.length > 0 ? (
           filteredErrors.map((item) => {
             const isPayloadOpen = !!expandedPayloads[item.code];
@@ -209,43 +223,43 @@ ${item.solutionZh}
             return (
               <div
                 key={item.code}
-                className="bg-white rounded-2xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all overflow-hidden"
+                className="app-surface rounded-lg border app-border overflow-hidden transition-colors"
               >
-                {/* Card Header */}
-                <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center space-x-3">
-                    <span className="px-3 py-1 rounded-xl bg-slate-900 text-white font-mono font-black text-sm tracking-wide shadow-2xs">
+                {/* Header Strip */}
+                <div className="px-4 py-2.5 border-b app-border app-surface-subtle flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center space-x-2">
+                    <span className="font-mono font-bold text-sm tracking-tight text-emerald-500">
                       #{item.code}
                     </span>
 
                     {getSeverityBadge(item.severity)}
 
-                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                      {item.categoryNameZh}
+                    <span className="font-mono text-[11px] app-text-dim px-1.5 py-0.5 rounded app-surface border app-border">
+                      {item.category}
                     </span>
 
                     {item.httpStatus && (
-                      <span className="text-[11px] font-mono text-slate-400">
+                      <span className="font-mono text-[11px] app-text-dim">
                         HTTP {item.httpStatus}
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-1.5">
                     <button
                       onClick={() => handleCopyReport(item)}
-                      className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 transition-colors shadow-2xs"
-                      title="复制完整诊断报告与解决步骤"
+                      className="flex items-center space-x-1 px-2 py-0.5 rounded text-[11px] font-mono app-surface app-text-muted hover:app-text-main border app-border transition-colors"
+                      title="复制诊断报告"
                     >
                       {isCopied ? (
                         <>
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span className="text-emerald-700 font-semibold">已复制诊断报告</span>
+                          <Check className="w-3 h-3 text-emerald-500" />
+                          <span className="text-emerald-500">COPIED</span>
                         </>
                       ) : (
                         <>
-                          <Copy className="w-3.5 h-3.5 text-slate-500" />
-                          <span>复制诊断</span>
+                          <Copy className="w-3 h-3 text-slate-400" />
+                          <span>COPY_REPORT</span>
                         </>
                       )}
                     </button>
@@ -254,87 +268,78 @@ ${item.solutionZh}
                       href={item.docUrl || 'https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes'}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex items-center space-x-1 px-3 py-1.5 rounded-xl text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors border border-emerald-200/80 shadow-2xs"
-                      title="在 Meta 官方文档中查看"
+                      className="flex items-center space-x-1 px-2 py-0.5 rounded text-[11px] font-mono text-emerald-500 hover:text-emerald-400 app-surface border app-border transition-colors"
                     >
-                      <span>Meta 原文</span>
-                      <ExternalLink className="w-3 h-3 ml-0.5" />
+                      <span>DOCS</span>
+                      <ExternalLink className="w-2.5 h-2.5" />
                     </a>
                   </div>
                 </div>
 
-                {/* Card Body */}
-                <div className="p-5 sm:p-6 space-y-4">
-                  {/* Titles */}
+                {/* Content Block */}
+                <div className="p-4 space-y-3">
+                  {/* Title */}
                   <div>
-                    <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                    <h3 className="text-sm font-bold app-text-main tracking-tight">
                       {item.titleZh}
                     </h3>
-                    <div className="text-xs font-medium text-slate-500 mt-0.5">
+                    <div className="text-xs font-mono app-text-dim mt-0.5">
                       {item.titleEn}
                     </div>
                   </div>
 
-                  {/* Dual Details (Chinese + English) */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
-                      <div className="font-bold text-slate-700 flex items-center space-x-1.5">
-                        <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-                        <span>原因分析与中文释义</span>
+                  {/* Dual Details */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                    <div className="p-3 rounded-md app-surface-subtle border app-border space-y-1">
+                      <div className="text-[11px] font-mono font-semibold app-text-dim uppercase">
+                        原因与释义 (Diagnosis)
                       </div>
-                      <p className="text-slate-600 leading-relaxed whitespace-pre-line">
+                      <p className="app-text-muted leading-relaxed whitespace-pre-line text-xs">
                         {item.detailsZh}
                       </p>
                     </div>
 
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
-                      <div className="font-bold text-slate-700 flex items-center space-x-1.5">
-                        <BookOpen className="w-3.5 h-3.5 text-slate-500" />
-                        <span>Meta 官方英文描述</span>
+                    <div className="p-3 rounded-md app-surface-subtle border app-border space-y-1">
+                      <div className="text-[11px] font-mono font-semibold app-text-dim uppercase">
+                        Meta Official Details
                       </div>
-                      <p className="text-slate-600 leading-relaxed font-mono text-[11px] whitespace-pre-line">
+                      <p className="app-text-dim font-mono text-[11px] leading-relaxed whitespace-pre-line">
                         {item.detailsEn}
                       </p>
                     </div>
                   </div>
 
-                  {/* Solution Highlight Box */}
-                  <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50/70 to-teal-50/70 border border-emerald-200/80 text-xs">
-                    <div className="font-bold text-emerald-950 flex items-center space-x-1.5 mb-1.5">
-                      <Sparkles className="w-4 h-4 text-emerald-600" />
-                      <span>官方推荐排查与解决方案 (Resolution)</span>
+                  {/* Solution Block */}
+                  <div className="p-3 rounded-md app-surface-subtle border app-border text-xs space-y-1">
+                    <div className="text-[11px] font-mono font-bold text-emerald-500 uppercase flex items-center space-x-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span>解决方案 (Resolution Action)</span>
                     </div>
-                    <p className="text-emerald-900 leading-relaxed whitespace-pre-line font-medium">
+                    <p className="app-text-main leading-relaxed whitespace-pre-line font-medium text-xs">
                       {item.solutionZh}
                     </p>
                     {item.solutionEn && item.solutionEn !== item.solutionZh && (
-                      <p className="text-emerald-700/80 text-[11px] mt-2 pt-2 border-t border-emerald-200/60 leading-relaxed">
-                        <strong>Official advice: </strong>{item.solutionEn}
+                      <p className="app-text-dim font-mono text-[11px] pt-1.5 border-t app-border leading-relaxed">
+                        {item.solutionEn}
                       </p>
                     )}
                   </div>
 
-                  {/* Collapsible Error Payload JSON */}
+                  {/* Payload Accordion */}
                   {item.examplePayload && (
-                    <div>
+                    <div className="pt-1">
                       <button
                         onClick={() => togglePayload(item.code)}
-                        className="flex items-center space-x-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
+                        className="flex items-center space-x-1.5 text-[11px] font-mono app-text-dim hover:app-text-main transition-colors"
                       >
-                        <FileCode2 className="w-3.5 h-3.5 text-slate-500" />
-                        <span>
-                          {isPayloadOpen ? '收起标准报错 JSON 响应结构' : '查看标准报错 JSON 响应结构 (Error Payload)'}
-                        </span>
-                        {isPayloadOpen ? (
-                          <ChevronUp className="w-3.5 h-3.5" />
-                        ) : (
-                          <ChevronDown className="w-3.5 h-3.5" />
-                        )}
+                        <FileCode className="w-3 h-3" />
+                        <span>{isPayloadOpen ? 'HIDE_PAYLOAD_JSON' : 'VIEW_PAYLOAD_JSON'}</span>
+                        {isPayloadOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                       </button>
 
                       {isPayloadOpen && (
-                        <div className="mt-2.5">
-                          <pre className="bg-slate-900 text-emerald-400 p-3.5 rounded-xl text-[11px] font-mono overflow-x-auto shadow-inner">
+                        <div className="mt-2">
+                          <pre className="app-code-bg app-border border p-3 rounded text-[11px] font-mono app-text-muted overflow-x-auto">
                             {item.examplePayload}
                           </pre>
                         </div>
@@ -346,13 +351,10 @@ ${item.solutionZh}
             );
           })
         ) : (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3 shadow-2xs">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
-              <Search className="w-6 h-6" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900">未找到匹配的 WhatsApp 错误码</h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
-              没有找到与 &quot;<span className="text-emerald-600 font-semibold">{query}</span>&quot; 相关的记录。您可以尝试输入纯数字错误码（如 131047），或尝试如 &quot;24小时&quot;、&quot;模板&quot;、&quot;限流&quot; 等通用关键词。
+          <div className="app-surface rounded-lg border app-border p-10 text-center space-y-2">
+            <div className="font-mono text-sm app-text-muted">NO_MATCHING_ERROR_CODES</div>
+            <p className="text-xs app-text-dim font-mono">
+              没有找到与 &quot;{query}&quot; 相关的 WhatsApp 错误记录。
             </p>
             <div className="pt-2">
               <button
@@ -360,9 +362,9 @@ ${item.solutionZh}
                   setQuery('');
                   setActiveCategory('all');
                 }}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-colors"
+                className="px-3 py-1 app-surface-subtle border app-border rounded text-xs font-mono app-text-main hover:app-surface-hover"
               >
-                清空搜索重置
+                RESET_QUERY
               </button>
             </div>
           </div>

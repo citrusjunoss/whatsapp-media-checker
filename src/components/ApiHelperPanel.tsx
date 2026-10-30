@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ValidationResult } from '../core/validator';
 import { generateApiSnippets, ApiHelperConfig } from '../core/apiHelper';
-import { Copy, Check, Terminal, Code2, Settings2, ShieldAlert } from 'lucide-react';
+import { Copy, Check, Terminal, Code2, Settings2 } from 'lucide-react';
 
 interface ApiHelperPanelProps {
   activeResult: ValidationResult;
@@ -46,193 +46,154 @@ export const ApiHelperPanel: React.FC<ApiHelperPanelProps> = ({ activeResult }) 
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-      {/* Header */}
-      <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/70">
-        <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center">
-            <Terminal className="w-4 h-4" />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-slate-900">
-              Meta Graph API 请求代码生成器
-            </h3>
-            <p className="text-[11px] text-slate-500">
-              {activeResult.mode === 'template_header'
-                ? '自动生成模板 Header 上传与消息模板组件配置'
-                : '自动生成普通媒体上传与消息发送 cURL / JSON'}
-            </p>
-          </div>
+    <div className="app-surface rounded-lg border app-border overflow-hidden transition-colors">
+      {/* Header Strip */}
+      <div className="p-3 border-b app-border app-surface-subtle flex items-center justify-between text-xs">
+        <div className="flex items-center space-x-2">
+          <Terminal className="w-4 h-4 text-emerald-500" />
+          <span className="font-mono font-bold app-text-main">META_GRAPH_API_SNIPPETS</span>
         </div>
 
         <button
           onClick={() => setShowConfig(!showConfig)}
-          className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg shadow-2xs transition-colors"
+          className="flex items-center space-x-1 px-2.5 py-1 text-[11px] font-mono app-surface border app-border app-text-muted hover:app-text-main rounded transition-colors"
         >
-          <Settings2 className="w-3.5 h-3.5 text-slate-500" />
-          <span>{showConfig ? '收起 API 参数' : '配置 API 参数'}</span>
+          <Settings2 className="w-3 h-3" />
+          <span>{showConfig ? 'HIDE_CONFIG' : 'API_CREDENTIALS'}</span>
         </button>
       </div>
 
-      {/* Config Drawer / Settings */}
+      {/* Config Drawer */}
       {showConfig && (
-        <div className="p-5 bg-slate-50/90 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+        <div className="p-3 border-b app-border app-surface-subtle grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 text-xs font-mono">
           <div>
-            <label className="block text-slate-600 font-semibold mb-1">Meta App ID</label>
+            <label className="block app-text-dim text-[10px] mb-1">APP_ID</label>
             <input
               type="text"
-              placeholder="e.g. 1234567890"
+              placeholder="1234567890"
               value={config.appId || ''}
               onChange={(e) => setConfig({ ...config, appId: e.target.value })}
-              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs"
+              className="w-full px-2 py-1 app-surface border app-border rounded text-[11px] app-text-main focus:outline-none focus:border-emerald-500"
             />
           </div>
 
           <div>
-            <label className="block text-slate-600 font-semibold mb-1">Phone Number ID</label>
+            <label className="block app-text-dim text-[10px] mb-1">PHONE_NUMBER_ID</label>
             <input
               type="text"
-              placeholder="e.g. 10987654321"
+              placeholder="10987654321"
               value={config.phoneNumberId || ''}
               onChange={(e) => setConfig({ ...config, phoneNumberId: e.target.value })}
-              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs"
+              className="w-full px-2 py-1 app-surface border app-border rounded text-[11px] app-text-main focus:outline-none focus:border-emerald-500"
             />
           </div>
 
           <div>
-            <label className="block text-slate-600 font-semibold mb-1">Access Token</label>
+            <label className="block app-text-dim text-[10px] mb-1">ACCESS_TOKEN</label>
             <input
               type="password"
               placeholder="EAAG..."
               value={config.accessToken || ''}
               onChange={(e) => setConfig({ ...config, accessToken: e.target.value })}
-              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs"
+              className="w-full px-2 py-1 app-surface border app-border rounded text-[11px] app-text-main focus:outline-none focus:border-emerald-500"
             />
           </div>
 
           <div>
-            <label className="block text-slate-600 font-semibold mb-1">测试接收手机号</label>
+            <label className="block app-text-dim text-[10px] mb-1">RECIPIENT_PHONE</label>
             <input
               type="text"
               placeholder="+8613800000000"
               value={config.toPhoneNumber || ''}
               onChange={(e) => setConfig({ ...config, toPhoneNumber: e.target.value })}
-              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs"
+              className="w-full px-2 py-1 app-surface border app-border rounded text-[11px] app-text-main focus:outline-none focus:border-emerald-500"
             />
           </div>
         </div>
       )}
 
-      {/* Snippet Content */}
-      <div className="p-6 space-y-5">
+      {/* Snippet Blocks */}
+      <div className="p-4 space-y-4 font-mono text-xs">
         {activeResult.mode === 'template_header' ? (
           <>
-            {/* Template Header Step 1 */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
-                  <span className="w-5 h-5 rounded-full bg-teal-100 text-teal-800 text-[11px] font-bold flex items-center justify-center">
-                    1
-                  </span>
-                  <span>第一步：初始化 Resumable Upload 上传会话（POST /uploads）</span>
-                </span>
+              <div className="flex items-center justify-between mb-1 text-[11px]">
+                <span className="app-text-dim">STEP_1: INITIALIZE_RESUMABLE_SESSION (POST /uploads)</span>
                 <button
                   onClick={() => copyToClipboard(snippets.step1Curl!, 'step1')}
-                  className="flex items-center space-x-1 text-xs text-teal-700 hover:text-teal-800 font-semibold"
+                  className="text-emerald-500 hover:text-emerald-400 flex items-center space-x-1"
                 >
-                  {copiedKey === 'step1' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedKey === 'step1' ? '已复制' : '复制 cURL'}</span>
+                  {copiedKey === 'step1' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  <span>{copiedKey === 'step1' ? 'COPIED' : 'COPY'}</span>
                 </button>
               </div>
-              <pre className="bg-slate-900 text-teal-400 p-3 rounded-xl text-[11px] font-mono overflow-x-auto whitespace-pre-wrap">
+              <pre className="app-code-bg border app-border p-2.5 rounded text-[11px] app-text-muted overflow-x-auto whitespace-pre-wrap">
                 {snippets.step1Curl}
               </pre>
             </div>
 
-            {/* Template Header Step 2 */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
-                  <span className="w-5 h-5 rounded-full bg-teal-100 text-teal-800 text-[11px] font-bold flex items-center justify-center">
-                    2
-                  </span>
-                  <span>第二步：上传二进制文件流（带 file_offset: 0 请求头）</span>
-                </span>
+              <div className="flex items-center justify-between mb-1 text-[11px]">
+                <span className="app-text-dim">STEP_2: UPLOAD_BINARY_STREAM (POST /upload:id)</span>
                 <button
                   onClick={() => copyToClipboard(snippets.step2Curl!, 'step2')}
-                  className="flex items-center space-x-1 text-xs text-teal-700 hover:text-teal-800 font-semibold"
+                  className="text-emerald-500 hover:text-emerald-400 flex items-center space-x-1"
                 >
-                  {copiedKey === 'step2' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedKey === 'step2' ? '已复制' : '复制 cURL'}</span>
+                  {copiedKey === 'step2' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  <span>{copiedKey === 'step2' ? 'COPIED' : 'COPY'}</span>
                 </button>
               </div>
-              <pre className="bg-slate-900 text-teal-400 p-3 rounded-xl text-[11px] font-mono overflow-x-auto whitespace-pre-wrap">
+              <pre className="app-code-bg border app-border p-2.5 rounded text-[11px] app-text-muted overflow-x-auto whitespace-pre-wrap">
                 {snippets.step2Curl}
               </pre>
             </div>
 
-            {/* Template Header Step 3: Template JSON */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
-                  <Code2 className="w-4 h-4 text-slate-500" />
-                  <span>第三步：创建模板组件 JSON（填入第二步返回的 header_handle）</span>
-                </span>
+              <div className="flex items-center justify-between mb-1 text-[11px]">
+                <span className="app-text-dim">STEP_3: TEMPLATE_COMPONENT_HEADER_JSON</span>
                 <button
                   onClick={() => copyToClipboard(snippets.templateComponentJson!, 'json')}
-                  className="flex items-center space-x-1 text-xs text-teal-700 hover:text-teal-800 font-semibold"
+                  className="text-emerald-500 hover:text-emerald-400 flex items-center space-x-1"
                 >
-                  {copiedKey === 'json' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedKey === 'json' ? '已复制' : '复制 JSON'}</span>
+                  {copiedKey === 'json' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  <span>{copiedKey === 'json' ? 'COPIED' : 'COPY'}</span>
                 </button>
               </div>
-              <pre className="bg-slate-900 text-slate-200 p-3 rounded-xl text-[11px] font-mono overflow-x-auto">
+              <pre className="app-code-bg border app-border p-2.5 rounded text-[11px] app-text-muted overflow-x-auto">
                 {snippets.templateComponentJson}
               </pre>
             </div>
           </>
         ) : (
           <>
-            {/* Standard Media Upload */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
-                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center justify-center">
-                    1
-                  </span>
-                  <span>上传媒体文件到 WhatsApp 服务器（POST /media）</span>
-                </span>
+              <div className="flex items-center justify-between mb-1 text-[11px]">
+                <span className="app-text-dim">1. UPLOAD_MEDIA_ASSET (POST /{config.phoneNumberId || 'PHONE_NUMBER_ID'}/media)</span>
                 <button
                   onClick={() => copyToClipboard(snippets.standardUploadCurl!, 'std_up')}
-                  className="flex items-center space-x-1 text-xs text-emerald-700 hover:text-emerald-800 font-semibold"
+                  className="text-emerald-500 hover:text-emerald-400 flex items-center space-x-1"
                 >
-                  {copiedKey === 'std_up' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedKey === 'std_up' ? '已复制' : '复制 cURL'}</span>
+                  {copiedKey === 'std_up' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  <span>{copiedKey === 'std_up' ? 'COPIED' : 'COPY'}</span>
                 </button>
               </div>
-              <pre className="bg-slate-900 text-emerald-400 p-3 rounded-xl text-[11px] font-mono overflow-x-auto whitespace-pre-wrap">
+              <pre className="app-code-bg border app-border p-2.5 rounded text-[11px] app-text-muted overflow-x-auto whitespace-pre-wrap">
                 {snippets.standardUploadCurl}
               </pre>
             </div>
 
-            {/* Standard Media Message Send */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
-                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center justify-center">
-                    2
-                  </span>
-                  <span>发送媒体消息给用户（POST /messages）</span>
-                </span>
+              <div className="flex items-center justify-between mb-1 text-[11px]">
+                <span className="app-text-dim">2. DISPATCH_MESSAGE (POST /{config.phoneNumberId || 'PHONE_NUMBER_ID'}/messages)</span>
                 <button
                   onClick={() => copyToClipboard(snippets.sendMessageCurl!, 'std_msg')}
-                  className="flex items-center space-x-1 text-xs text-emerald-700 hover:text-emerald-800 font-semibold"
+                  className="text-emerald-500 hover:text-emerald-400 flex items-center space-x-1"
                 >
-                  {copiedKey === 'std_msg' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedKey === 'std_msg' ? '已复制' : '复制 cURL'}</span>
+                  {copiedKey === 'std_msg' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  <span>{copiedKey === 'std_msg' ? 'COPIED' : 'COPY'}</span>
                 </button>
               </div>
-              <pre className="bg-slate-900 text-emerald-400 p-3 rounded-xl text-[11px] font-mono overflow-x-auto whitespace-pre-wrap">
+              <pre className="app-code-bg border app-border p-2.5 rounded text-[11px] app-text-muted overflow-x-auto whitespace-pre-wrap">
                 {snippets.sendMessageCurl}
               </pre>
             </div>

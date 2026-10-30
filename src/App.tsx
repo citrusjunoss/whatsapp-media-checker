@@ -3,11 +3,10 @@ import { Header, AppNav } from './components/Header';
 import { FileToolsView } from './components/FileToolsView';
 import { ErrorLookup } from './components/ErrorLookup';
 import { RulesReference } from './components/RulesReference';
-import { ShieldCheck } from 'lucide-react';
+import { ThemeProvider } from './core/themeContext';
 
-export function App() {
+function MainApp() {
   const [activeNav, setActiveNav] = useState<AppNav>(() => {
-    // Read from window.location.hash
     if (typeof window !== 'undefined' && window.location.hash.includes('errors')) {
       return 'error_lookup';
     }
@@ -16,7 +15,6 @@ export function App() {
 
   const [isRulesOpen, setIsRulesOpen] = useState(false);
 
-  // Sync hash on navigation change
   const handleNavChange = (nav: AppNav) => {
     setActiveNav(nav);
     if (typeof window !== 'undefined') {
@@ -24,7 +22,6 @@ export function App() {
     }
   };
 
-  // Listen for browser back/forward hash changes
   useEffect(() => {
     const handleHashChange = () => {
       if (window.location.hash.includes('errors')) {
@@ -39,14 +36,14 @@ export function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen app-bg flex flex-col transition-colors">
       <Header
         activeNav={activeNav}
         onNavChange={handleNavChange}
         onOpenRules={() => setIsRulesOpen(true)}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
         {activeNav === 'file_tools' ? (
           <FileToolsView onOpenRules={() => setIsRulesOpen(true)} />
         ) : (
@@ -54,25 +51,31 @@ export function App() {
         )}
       </main>
 
-      {/* Rules Reference Drawer/Modal */}
       <RulesReference
         isOpen={isRulesOpen}
         onClose={() => setIsRulesOpen(false)}
       />
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
+      <footer className="border-t app-border py-4 mt-8 app-surface-subtle text-xs font-mono app-text-dim transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center space-x-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>WhatsApp 开发者综合工具箱 · 纯前端架构 · 支持直接部署至 GitHub Pages</span>
-          </div>
           <div>
-            基于 Meta Graph API &amp; WhatsApp Cloud API 官方规范构建
+            WhatsApp DevTools · Client-side Only · Zero Server Storage
+          </div>
+          <div className="flex items-center space-x-3">
+            <span>Meta Graph API &amp; Cloud API v26.0</span>
+            <span className="app-text-muted">MIT License</span>
           </div>
         </div>
       </footer>
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <ThemeProvider>
+      <MainApp />
+    </ThemeProvider>
   );
 }
 

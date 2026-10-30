@@ -9,11 +9,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   XCircle,
-  FileCheck,
-  FileWarning,
   ExternalLink,
   Wrench,
-  Info,
   Clock,
   Video,
   FileText,
@@ -34,245 +31,198 @@ export const InspectionResult: React.FC<InspectionResultProps> = ({
   const getStatusIcon = (status: CheckStatus) => {
     switch (status) {
       case 'pass':
-        return <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />;
+        return <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />;
       case 'warning':
-        return <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />;
+        return <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />;
       case 'error':
-        return <XCircle className="w-5 h-5 text-rose-500 flex-shrink-0" />;
+        return <XCircle className="w-4 h-4 text-rose-500 flex-shrink-0" />;
     }
   };
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'image':
-        return <ImageIcon className="w-5 h-5 text-blue-500" />;
+        return <ImageIcon className="w-3.5 h-3.5 text-blue-500" />;
       case 'video':
-        return <Video className="w-5 h-5 text-purple-500" />;
+        return <Video className="w-3.5 h-3.5 text-purple-500" />;
       case 'audio':
-        return <Volume2 className="w-5 h-5 text-amber-500" />;
+        return <Volume2 className="w-3.5 h-3.5 text-amber-500" />;
       case 'document':
-        return <FileText className="w-5 h-5 text-emerald-500" />;
+        return <FileText className="w-3.5 h-3.5 text-emerald-500" />;
       case 'sticker':
-        return <Smile className="w-5 h-5 text-pink-500" />;
+        return <Smile className="w-3.5 h-3.5 text-pink-500" />;
       default:
-        return <Info className="w-5 h-5 text-slate-500" />;
+        return <FileText className="w-3.5 h-3.5 text-slate-500" />;
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-      {/* Overall Verdict Banner */}
-      <div
-        className={`px-6 py-5 border-b ${
-          result.overallStatus === 'pass'
-            ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200'
-            : result.overallStatus === 'warning'
-            ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200'
-            : 'bg-gradient-to-r from-rose-50 to-red-50 border-rose-200'
-        }`}
-      >
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3.5">
-            <div
-              className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow ${
-                result.overallStatus === 'pass'
-                  ? 'bg-emerald-600'
-                  : result.overallStatus === 'warning'
-                  ? 'bg-amber-500'
-                  : 'bg-rose-600'
-              }`}
-            >
-              {result.overallStatus === 'pass' ? (
-                <FileCheck className="w-6 h-6" />
-              ) : (
-                <FileWarning className="w-6 h-6" />
-              )}
-            </div>
+    <div className="app-surface rounded-lg border app-border overflow-hidden transition-colors">
+      {/* Overall Verdict Header */}
+      <div className="px-4 py-3 border-b app-border app-surface-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 rounded-md app-surface border app-border flex items-center justify-center">
+            {getStatusIcon(result.overallStatus)}
+          </div>
 
-            <div>
-              <div className="flex items-center space-x-2">
-                <span
-                  className={`text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                    result.overallStatus === 'pass'
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : result.overallStatus === 'warning'
-                      ? 'bg-amber-100 text-amber-800'
-                      : 'bg-rose-100 text-rose-800'
-                  }`}
-                >
-                  {result.overallStatus === 'pass'
-                    ? '检测通过 · 完全兼容'
-                    : result.overallStatus === 'warning'
-                    ? '可发送 · 建议优化'
-                    : '检测拦截 · 不兼容'}
-                </span>
-                <span className="text-xs text-slate-500">
-                  {result.mode === 'template_header' ? '模板 Header 规则' : '标准媒体规则'}
-                </span>
-              </div>
-
-              <h2 className="text-base font-bold text-slate-900 mt-1 truncate max-w-xl">
-                {result.fileName}
-              </h2>
-
-              <p
-                className={`text-xs mt-1 font-medium ${
+          <div>
+            <div className="flex items-center space-x-2">
+              <span
+                className={`text-[10px] font-mono font-bold uppercase px-1.5 py-0.2 rounded border ${
                   result.overallStatus === 'pass'
-                    ? 'text-emerald-800'
+                    ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30'
                     : result.overallStatus === 'warning'
-                    ? 'text-amber-800'
-                    : 'text-rose-800'
+                    ? 'bg-amber-500/10 text-amber-500 border-amber-500/30'
+                    : 'bg-rose-500/10 text-rose-500 border-rose-500/30'
                 }`}
               >
-                {result.statusReason}
-              </p>
+                {result.overallStatus === 'pass'
+                  ? 'COMPLIANT'
+                  : result.overallStatus === 'warning'
+                  ? 'WARN_OPTIMIZE'
+                  : 'BLOCKED'}
+              </span>
+              <span className="text-[11px] font-mono app-text-dim">
+                {result.mode === 'template_header' ? 'RULE: TEMPLATE_HEADER' : 'RULE: STANDARD_MEDIA'}
+              </span>
             </div>
-          </div>
 
-          {/* Quick Action Buttons */}
-          {result.availableFixes.length > 0 && (
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => onSelectFix(result.availableFixes[0])}
-                className="flex items-center space-x-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 rounded-xl shadow-sm transition-all"
-              >
-                <Wrench className="w-3.5 h-3.5" />
-                <span>一键修复 / 转换</span>
-              </button>
-            </div>
-          )}
+            <h3 className="text-sm font-bold app-text-main font-mono mt-0.5 truncate max-w-md">
+              {result.fileName}
+            </h3>
+
+            <p className="text-xs app-text-muted mt-0.5 font-mono">
+              {result.statusReason}
+            </p>
+          </div>
         </div>
+
+        {result.availableFixes.length > 0 && (
+          <button
+            onClick={() => onSelectFix(result.availableFixes[0])}
+            className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-mono font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-md transition-colors shadow-xs self-start sm:self-auto"
+          >
+            <Wrench className="w-3.5 h-3.5" />
+            <span>REPAIR_CONVERT</span>
+          </button>
+        )}
       </div>
 
-      {/* Overview Metric Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-slate-50/60 border-b border-slate-200/60">
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-          <div className="flex items-center space-x-2 text-xs text-slate-500 mb-1">
+      {/* Overview Metric Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 border-b app-border app-surface-subtle font-mono text-xs">
+        <div className="app-surface p-2.5 rounded border app-border">
+          <div className="flex items-center space-x-1.5 app-text-dim text-[11px] mb-0.5">
             {getCategoryIcon(result.detectedCategory)}
-            <span>媒体分类</span>
+            <span>CATEGORY</span>
           </div>
-          <div className="text-sm font-bold text-slate-900 capitalize">
+          <div className="font-bold app-text-main capitalize">
             {result.detectedCategory}
           </div>
-          <div className="text-[11px] text-slate-500 truncate" title={result.detectedMime}>
+          <div className="text-[10px] app-text-dim truncate">
             {result.detectedMime}
           </div>
         </div>
 
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-          <div className="flex items-center space-x-2 text-xs text-slate-500 mb-1">
-            <Info className="w-4 h-4 text-slate-400" />
-            <span>文件大小</span>
-          </div>
-          <div className="text-sm font-bold text-slate-900">
+        <div className="app-surface p-2.5 rounded border app-border">
+          <div className="app-text-dim text-[11px] mb-0.5">SIZE</div>
+          <div className="font-bold app-text-main">
             {formatBytes(result.fileSize)}
           </div>
-          <div className="text-[11px] text-slate-500">
+          <div className="text-[10px] app-text-dim">
             {result.detectedCategory === 'image'
-              ? '限额 ≤ 5 MB'
+              ? 'LIMIT: ≤ 5 MB'
               : result.detectedCategory === 'video' || result.detectedCategory === 'audio'
-              ? '限额 ≤ 16 MB'
+              ? 'LIMIT: ≤ 16 MB'
               : result.detectedCategory === 'sticker'
-              ? '限额 ≤ 100 KB'
-              : '限额 ≤ 100 MB'}
+              ? 'LIMIT: ≤ 100 KB'
+              : 'LIMIT: ≤ 100 MB'}
           </div>
         </div>
 
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-          <div className="flex items-center space-x-2 text-xs text-slate-500 mb-1">
-            <Video className="w-4 h-4 text-slate-400" />
-            <span>分辨率 / 时长</span>
-          </div>
-          <div className="text-sm font-bold text-slate-900 truncate">
+        <div className="app-surface p-2.5 rounded border app-border">
+          <div className="app-text-dim text-[11px] mb-0.5">DIMENSIONS / DURATION</div>
+          <div className="font-bold app-text-main truncate">
             {result.metadata.width && result.metadata.height
-              ? `${result.metadata.width} × ${result.metadata.height} px`
+              ? `${result.metadata.width}×${result.metadata.height}`
               : result.metadata.duration
-              ? `${result.metadata.duration} 秒`
+              ? `${result.metadata.duration}s`
               : 'N/A'}
           </div>
-          <div className="text-[11px] text-slate-500">
+          <div className="text-[10px] app-text-dim">
             {result.metadata.aspectRatio
-              ? `宽高比 ${result.metadata.aspectRatio}`
-              : result.metadata.duration
-              ? `音频采样率 ${result.metadata.sampleRate || 44100}Hz`
-              : '静态文件'}
+              ? `RATIO: ${result.metadata.aspectRatio}`
+              : result.metadata.sampleRate
+              ? `${result.metadata.sampleRate} Hz`
+              : 'STATIC'}
           </div>
         </div>
 
-        <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-          <div className="flex items-center space-x-2 text-xs text-slate-500 mb-1">
-            <Clock className="w-4 h-4 text-slate-400" />
-            <span>编码与 FastStart</span>
+        <div className="app-surface p-2.5 rounded border app-border">
+          <div className="app-text-dim text-[11px] mb-0.5">CODEC &amp; FASTSTART</div>
+          <div className="font-bold app-text-main truncate">
+            {result.metadata.videoCodec || (result.detectedCategory === 'sticker' ? 'WEBP' : 'STANDARD')}
           </div>
-          <div className="text-sm font-bold text-slate-900 truncate">
-            {result.metadata.videoCodec
-              ? result.metadata.videoCodec
-              : result.detectedCategory === 'sticker'
-              ? 'WebP 贴纸'
-              : '标准格式'}
-          </div>
-          <div className="text-[11px] text-slate-500">
+          <div className="text-[10px] app-text-dim">
             {result.metadata.hasFastStart !== undefined
               ? result.metadata.hasFastStart
-                ? '✅ FastStart 已开启'
-                : '⚠️ 未开启 FastStart'
-              : '无需 moov 优化'}
+                ? 'MOOV_IN_FRONT'
+                : 'NO_FASTSTART'
+              : 'N/A'}
           </div>
         </div>
       </div>
 
-      {/* Detailed Check Checklist Table */}
-      <div className="p-6">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
-          规则校验详细矩阵（{result.items.length} 项检测）
-        </h3>
+      {/* Rules Matrix List */}
+      <div className="p-3 space-y-1.5 font-mono text-xs">
+        <div className="text-[11px] font-bold app-text-dim uppercase px-1">
+          RULE_CHECK_MATRIX ({result.items.length} CHECKS)
+        </div>
 
-        <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+        <div className="divide-y app-border border rounded app-surface">
           {result.items.map((item: CheckItem) => (
             <div
               key={item.id}
-              className={`p-4 transition-colors flex items-start justify-between space-x-4 ${
+              className={`p-3 flex items-start justify-between space-x-3 transition-colors ${
                 item.status === 'error'
-                  ? 'bg-rose-50/40'
+                  ? 'bg-rose-500/5'
                   : item.status === 'warning'
-                  ? 'bg-amber-50/30'
-                  : 'bg-white hover:bg-slate-50/60'
+                  ? 'bg-amber-500/5'
+                  : ''
               }`}
             >
-              <div className="flex items-start space-x-3">
-                {getStatusIcon(item.status)}
+              <div className="flex items-start space-x-2.5">
+                <div className="mt-0.5">{getStatusIcon(item.status)}</div>
                 <div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-semibold text-slate-900">
-                      {item.name}
-                    </span>
+                    <span className="font-semibold app-text-main">{item.name}</span>
                     {item.docUrl && (
                       <a
                         href={item.docUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-slate-400 hover:text-slate-600 transition-colors"
-                        title="查看 Meta 官方文档说明"
+                        className="app-text-dim hover:app-text-main"
                       >
-                        <ExternalLink className="w-3.5 h-3.5" />
+                        <ExternalLink className="w-3 h-3" />
                       </a>
                     )}
                   </div>
-                  <p className="text-xs text-slate-600 mt-1">{item.message}</p>
+                  <p className="app-text-muted text-[11px] mt-0.5 font-sans leading-relaxed">
+                    {item.message}
+                  </p>
                 </div>
               </div>
 
-              <div className="text-right text-xs flex-shrink-0">
-                <div className="text-slate-400 text-[10px]">Meta 期望</div>
-                <div className="font-medium text-slate-700">{item.expected}</div>
-                <div className="text-slate-400 text-[10px] mt-1">检测实际值</div>
+              <div className="text-right text-[11px] flex-shrink-0 font-mono">
+                <div className="app-text-dim text-[10px]">EXPECTED</div>
+                <div className="app-text-muted">{item.expected}</div>
+                <div className="app-text-dim text-[10px] mt-1">ACTUAL</div>
                 <div
-                  className={`font-mono text-[11px] font-semibold ${
+                  className={`font-bold ${
                     item.status === 'error'
-                      ? 'text-rose-600'
+                      ? 'text-rose-500'
                       : item.status === 'warning'
-                      ? 'text-amber-600'
-                      : 'text-emerald-700'
+                      ? 'text-amber-500'
+                      : 'text-emerald-500'
                   }`}
                 >
                   {item.actual}
@@ -282,14 +232,13 @@ export const InspectionResult: React.FC<InspectionResultProps> = ({
           ))}
         </div>
 
-        {/* Suggestions Card */}
+        {/* Suggestions */}
         {result.suggestions.length > 0 && (
-          <div className="mt-4 p-4 rounded-xl bg-blue-50 border border-blue-200/80 text-blue-900 text-xs">
-            <div className="font-bold flex items-center space-x-1.5 mb-1.5">
-              <Info className="w-4 h-4 text-blue-600" />
-              <span>修复与优化建议</span>
+          <div className="p-3 rounded border app-border app-surface-subtle text-xs space-y-1 font-sans">
+            <div className="font-bold app-text-main font-mono text-[11px]">
+              ACTIONABLE_SUGGESTIONS:
             </div>
-            <ul className="list-disc list-inside space-y-1 text-blue-800">
+            <ul className="list-disc list-inside space-y-0.5 app-text-muted text-xs">
               {result.suggestions.map((s: string, idx: number) => (
                 <li key={idx}>{s}</li>
               ))}
