@@ -6,7 +6,28 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DATA_FILE = path.resolve(__dirname, '../src/data/whatsapp-errors.json');
 
-const META_DOCS_URL = 'https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes';
+const META_DOCS_URL = 'https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes';
+const META_DOCS_FALLBACK_URL = 'https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes';
+const WABA_BASE_URL = 'https://developers.facebook.com/docs/graph-api/reference/whats-app-business-account/';
+const WABA_EDGES = [
+  '',
+  'activities/',
+  'call_analytics/',
+  'conversation_analytics/',
+  'dataset/',
+  'message_template_previews/',
+  'message_templates/',
+  'payment_configuration/',
+  'payment_configurations/',
+  'phone_numbers/',
+  'pricing_analytics/',
+  'product_catalogs/',
+  'solutions/',
+  'subscribed_apps/',
+  'template_groups/',
+  'upsert_message_templates/',
+  'welcome_message_sequences/',
+];
 
 // Curated high-quality bilingual mappings and metadata for WhatsApp error codes
 const ERROR_KNOWLEDGE_BASE = {
@@ -430,40 +451,286 @@ const ERROR_KNOWLEDGE_BASE = {
     severity: 'rate_limit',
     httpStatus: 429,
   },
+  104: {
+    category: 'authentication',
+    categoryNameZh: '身份鉴权与令牌',
+    titleEn: 'Incorrect Signature',
+    titleZh: 'API 请求签名校验失败',
+    detailsZh: '调用号码管理或资产配置接口时提供的 appsecret_proof 或请求签名校验不匹配。',
+    solutionZh: '检查用于生成签名的 App Secret 与当前使用的 Access Token 是否匹配，确保 HMAC-SHA256 算法计算正确。',
+    severity: 'blocker',
+    httpStatus: 400,
+  },
+  192: {
+    category: 'template',
+    categoryNameZh: '消息模板',
+    titleEn: 'Invalid Phone Number in Template Request',
+    titleZh: '创建模板关联号码无效',
+    detailsZh: '创建或关联消息模板时所指定的发送方号码格式不正确，或该号码未在当前 WABA 商业账号下激活。',
+    solutionZh: '检查请求中提供的商业电话号码 ID 与格式（必须为国际 E.164 格式，不含 + 号和空格），确认该号码在 Meta 控制台状态为 CONNECTED。',
+    severity: 'client_error',
+    httpStatus: 400,
+  },
+  300: {
+    category: 'registration',
+    categoryNameZh: '号码注册与验证',
+    titleEn: 'Edit Failure',
+    titleZh: '号码或资产属性编辑失败',
+    detailsZh: '尝试更新商业电话号码的展示名称、PIN 码或配置属性时发生底层更新失败。',
+    solutionZh: '确认当前号码处于正常可用状态且未在进行双重认证审核流程；若修改展示名称请先确保已通过企业商业认证。',
+    severity: 'client_error',
+    httpStatus: 400,
+  },
+  2500: {
+    category: 'general',
+    categoryNameZh: '常规 Graph API 错误',
+    titleEn: 'Error Parsing Graph Query',
+    titleZh: 'Graph API 查询语句语法解析失败',
+    detailsZh: 'URL 中的 fields、filtering 或 pagination 参数格式不正确，包含未转义字符或不支持的查询语法。',
+    solutionZh: '检查 GET 请求中的 query string 格式，确保逗号分隔字段名无多余空格，且过滤参数符合 Meta Graph API 规范。',
+    severity: 'client_error',
+    httpStatus: 400,
+  },
+  80008: {
+    category: 'rate_limit',
+    categoryNameZh: '频率与流控限制',
+    titleEn: 'WABA Account Rate Limit Exceeded',
+    titleZh: '商业账号级调用频次超限',
+    detailsZh: '短时间内向该 WhatsApp Business Account (WABA) 发起的 Graph API 请求总数超过 Meta 设定的并发安全阈值。',
+    solutionZh: '降低 API 轮询或批量调用频次，加入指数退避重试（Exponential Backoff）机制，参考 Meta 限频响应头 X-Business-Use-Case-Usage。',
+    severity: 'rate_limit',
+    httpStatus: 429,
+  },
+  131064: {
+    category: 'messaging',
+    categoryNameZh: '消息发送与接收',
+    titleEn: 'Restricted Messaging Tier',
+    titleZh: '账号处于受限发信等级',
+    detailsZh: '商业账号当前处于受限发信层级，无法向非测试收件人发起营销或业务通知。',
+    solutionZh: '在 WhatsApp Manager 中查看企业质量评级（Quality Rating），完成商业认证以提升 Messaging Tier 发信额度。',
+    severity: 'blocker',
+    httpStatus: 403,
+  },
+  134011: {
+    category: 'account',
+    categoryNameZh: '商业账号与封禁',
+    titleEn: 'Payment Configuration Error',
+    titleZh: '支付配置或商业账单异常',
+    detailsZh: '商业账号未绑定有效信用卡/支付方式，或所绑定的付款账户已欠费停用。',
+    solutionZh: '在 Meta 商务管理平台的“支付方式”页面添加有效付款凭证，结算逾期账单后重试。',
+    severity: 'blocker',
+    httpStatus: 402,
+  },
+  134100: {
+    category: 'template',
+    categoryNameZh: '消息模板',
+    titleEn: 'Flow is in Blocked State',
+    titleZh: 'WhatsApp Flow 处于阻断状态',
+    detailsZh: '消息模板引用的 WhatsApp Flow 交互式流程因安全审查不通过或被手动停用而无法加载。',
+    solutionZh: '在 WhatsApp Manager 中进入 Flows 界面，检查并重新发布 Flow 流程定义。',
+    severity: 'blocker',
+    httpStatus: 400,
+  },
+  134101: {
+    category: 'template',
+    categoryNameZh: '消息模板',
+    titleEn: 'Flow is in Throttled State',
+    titleZh: 'WhatsApp Flow 触发频控限制',
+    detailsZh: '当前 Flow 数据终端（Data Endpoint）短时间内处理的互动请求超过阈值。',
+    solutionZh: '优化后端 Flow Endpoint 处理延迟与并发吞吐量，实施缓存策略以降低响应时间。',
+    severity: 'rate_limit',
+    httpStatus: 429,
+  },
+  134102: {
+    category: 'template',
+    categoryNameZh: '消息模板',
+    titleEn: 'Flow Endpoint Error',
+    titleZh: 'WhatsApp Flow 终端服务异常',
+    detailsZh: 'Meta 尝试调用开发者的 Flow 数据终端时发生网络超时、证书失效或返回了非 200 HTTP 响应。',
+    solutionZh: '检查 Flow 数据终端 URL 的公网可达性与 HTTPS 证书，核对解密与加密响应签名逻辑。',
+    severity: 'service_unavailable',
+    httpStatus: 502,
+  },
+  135000: {
+    category: 'account',
+    categoryNameZh: '商业账号与封禁',
+    titleEn: 'Order / Payment Processing Timeout',
+    titleZh: '商业订单处理超时',
+    detailsZh: 'WhatsApp 商业支付交易在与支付服务提供商交互时发生超时中断。',
+    solutionZh: '检查关联的支付网关（如 Razorpay、PayU 等）运行状况，使用订单查询接口核对交易状态。',
+    severity: 'service_unavailable',
+    httpStatus: 504,
+  },
+  139000: {
+    category: 'template',
+    categoryNameZh: '消息模板',
+    titleEn: 'Blocked by Integrity',
+    titleZh: '内容触发安全与反垃圾合规拦截',
+    detailsZh: '提交的消息模板内容、变量占位符或包含的链接被 Meta 自动化反垃圾/安全合规系统（Integrity Engine）判定存在潜在风险或违规。',
+    solutionZh: '检查模板正文是否包含敏感商业诱导词、短网址（短链接跳转）或钓鱼欺诈嫌疑内容；修改话术并确保链接指向真实官方域名。',
+    severity: 'blocker',
+    httpStatus: 400,
+  },
+  1752041: {
+    category: 'account',
+    categoryNameZh: '商业账号与封禁',
+    titleEn: 'Product Not Found in Catalog',
+    titleZh: '商品目录中未找到对应商品',
+    detailsZh: '交互式产品消息（Single/Multi-Product Message）中指定的 retailer_id 在关联的商品目录中不存在或已下架。',
+    solutionZh: '在 Meta Commerce Manager 中确认商品目录已与 WABA 成功绑定，检查 retailer_id 是否有效且商品处于审核通过（Approved）状态。',
+    severity: 'client_error',
+    httpStatus: 404,
+  },
+  200000: {
+    category: 'registration',
+    categoryNameZh: '号码注册与验证',
+    titleEn: 'Cannot Add Phone Number to WABA',
+    titleZh: '无法将电话号码添加至商业账号',
+    detailsZh: '尝试将新号码绑定至 WABA 时失败，可能因该号码已被其他个人/商业 WhatsApp 账号占用、未完成注销或商业账号电话号码配额已达上限。',
+    solutionZh: '若号码此前在 WhatsApp 手机客户端使用，必须先在客户端执行“删除账号”注销；确认 WABA 所属企业是否已通过企业认证以获取更多号码配额。',
+    severity: 'blocker',
+    httpStatus: 400,
+  },
+  200002: {
+    category: 'template',
+    categoryNameZh: '消息模板',
+    titleEn: 'HSM Template Creation Failed',
+    titleZh: '结构化消息模板创建失败',
+    detailsZh: '创建 HSM 消息模板时组件结构定义错误，缺少必需的 BODY 组件或变量占位符序号不连续（如跳过 {{1}} 直接使用 {{2}}）。',
+    solutionZh: '核对 components 数组结构，必须包含 BODY 类型；变量参数序号必须从 {{1}} 开始严格递增，按钮链接变量仅允许在尾部添加。',
+    severity: 'client_error',
+    httpStatus: 400,
+  },
+  200005: {
+    category: 'template',
+    categoryNameZh: '消息模板',
+    titleEn: 'Template Insights Not Available',
+    titleZh: '模板送达与转化分析数据尚未就绪',
+    detailsZh: '请求读取该商业账号的模板统计分析（Template Insights）时，该模板发送量不足或 Meta 统计流水线尚未汇总完成。',
+    solutionZh: '模板数据分析通常需要积累一定的发送量（通常至少 100+ 条）并在次日生成报表，请等待 Meta 离线流水线产出数据后再行查询。',
+    severity: 'client_error',
+    httpStatus: 400,
+  },
+  200008: {
+    category: 'account',
+    categoryNameZh: '商业账号与封禁',
+    titleEn: 'WABA Has No Linked Phone Numbers',
+    titleZh: '商业账号未关联任何电话号码',
+    detailsZh: '调用会话分析、定价报表或发信操作时，当前指定的 WABA 商业账号下没有任何已验证启用的电话号码。',
+    solutionZh: '进入 Meta 商务管理平台 WhatsApp Manager，在 Phone Numbers 菜单下添加并验证至少一个企业电话号码，待状态为 Connected 后再重试。',
+    severity: 'blocker',
+    httpStatus: 400,
+  },
+  2593079: {
+    category: 'registration',
+    categoryNameZh: '号码注册与验证',
+    titleEn: 'Certificate Verification Failed',
+    titleZh: '号码证书签名验证失败',
+    detailsZh: '商业电话号码在注册或迁移验证时所提交的证书（cert）公钥签名与 Meta 系统注册记录不一致。',
+    solutionZh: '在 WhatsApp Manager 重新下载最新的号码证书，确保 base64 字符串无截断或空格换行符。',
+    severity: 'blocker',
+    httpStatus: 400,
+  },
+  2593107: {
+    category: 'registration',
+    categoryNameZh: '号码注册与验证',
+    titleEn: 'Migration Token Invalid',
+    titleZh: 'On-Premises 迁移凭证无效',
+    detailsZh: '从自建 On-Premises API 迁移至 Cloud API 时所提供的备份迁移令牌已过期或权限不足。',
+    solutionZh: '在源 On-Premises 实例重新调用 /v1/configs/backup 获取最新的迁移凭证，并在 24 小时内完成云端导入。',
+    severity: 'client_error',
+    httpStatus: 400,
+  },
+  2593108: {
+    category: 'registration',
+    categoryNameZh: '号码注册与验证',
+    titleEn: 'Cloud API Onboarding Mismatch',
+    titleZh: 'Cloud API 接入模式冲突',
+    detailsZh: '号码当前已作为 On-Premises 或其他 Cloud API 商业实体运行，无法直接执行初始化注册。',
+    solutionZh: '先在源商业中心释放该号码所有权，或联系 Meta 商业技术支持协助执行号码接入模式切换。',
+    severity: 'blocker',
+    httpStatus: 400,
+  },
 };
 
 export async function syncErrors() {
-  console.log('🔄 正在从 Meta 官方文档同步 WhatsApp 错误码...');
+  console.log('🔄 正在同步 WhatsApp 错误码（全量融合来源：Cloud API 统一手册 + WABA 侧边栏所有 Edge 目录）...');
   let fetchedRows = [];
+  const fetchedMap = new Map();
 
+  // 1. Fetch Cloud API Master Error Codes Doc (support redirect)
   try {
-    const res = await fetch(META_DOCS_URL, {
-      headers: {
-        'User-Agent': 'curl/8.1.2',
-        'Accept': '*/*',
-      },
+    let res = await fetch(META_DOCS_URL, {
+      headers: { 'User-Agent': 'curl/8.1.2', 'Accept': '*/*' },
     });
+    if (!res.ok) {
+      res = await fetch(META_DOCS_FALLBACK_URL, {
+        headers: { 'User-Agent': 'curl/8.1.2', 'Accept': '*/*' },
+      });
+    }
 
     if (res.ok) {
       const text = await res.text();
-      // Match markdown table rows: | `code` | details | solution |
       const tableRowRegex = /\|\s*`?(\d+)`?\s*\|\s*([^|]+)\|\s*([^|]+)\|/g;
       let match;
+      let count = 0;
       while ((match = tableRowRegex.exec(text)) !== null) {
         const code = parseInt(match[1], 10);
         const details = match[2].trim().replace(/<br>/g, '\n').replace(/&#039;/g, "'").replace(/&quot;/g, '"');
         const solution = match[3].trim().replace(/<br>/g, '\n').replace(/&#039;/g, "'").replace(/&quot;/g, '"');
         if (!isNaN(code)) {
-          fetchedRows.push({ code, details, solution });
+          fetchedMap.set(code, { code, details, solution, source: 'cloud_api_master' });
+          count++;
         }
       }
-      console.log(`✅ 从 Meta 官方页面成功解析到 ${fetchedRows.length} 条表格数据`);
+      console.log(`✅ [1/2] 成功从 WhatsApp Cloud API 官方手册解析到 ${count} 条错误码`);
     } else {
-      console.warn(`⚠️ 无法直接访问 Meta 页面 (HTTP ${res.status})，将使用内置权威知识库。`);
+      console.warn(`⚠️ 无法直接访问 Meta 官方手册 (HTTP ${res.status})，将使用内置权威知识库。`);
     }
   } catch (err) {
-    console.warn('⚠️ 抓取 Meta 官方页面发生网络警告:', err.message);
+    console.warn('⚠️ 抓取 Meta 官方手册发生网络警告:', err.message);
   }
+
+  // 2. Fetch all 17 WABA Edge reference pages concurrently
+  try {
+    console.log(`🔄 [2/2] 正在并发扫描 WABA 商业账号侧边栏所有 17 个 Edge 目录...`);
+    const wabaResults = await Promise.all(
+      WABA_EDGES.map(async (edge) => {
+        const url = `${WABA_BASE_URL}${edge}?locale=en_US`;
+        try {
+          const res = await fetch(url, { headers: { 'User-Agent': 'curl/8.1.2' } });
+          if (!res.ok) return [];
+          const text = await res.text();
+          const tables = [...text.matchAll(/<h3>Error Codes<\/h3>.*?<table[^>]*>(.*?)<\/table>/gis)];
+          const codes = [];
+          for (const t of tables) {
+            const trs = [...t[1].matchAll(/<tr><td>(\d+)<\/td><td>(.*?)<\/td><\/tr>/gis)];
+            for (const tr of trs) {
+              const code = parseInt(tr[1], 10);
+              const details = tr[2].replace(/<[^>]+>/g, '').replace(/&#039;/g, "'").replace(/&quot;/g, '"').trim();
+              codes.push({ code, details, solution: `Refer to WhatsApp Graph API Reference (${edge || 'root'}).`, source: `waba_${edge || 'root'}` });
+            }
+          }
+          return codes;
+        } catch {
+          return [];
+        }
+      })
+    );
+
+    let wabaCount = 0;
+    for (const item of wabaResults.flat()) {
+      if (!fetchedMap.has(item.code)) {
+        fetchedMap.set(item.code, item);
+        wabaCount++;
+      }
+    }
+    console.log(`✅ [2/2] 成功从 WABA 侧边栏 Edge 目录增补 ${wabaCount} 条独有管理/模板错误码（如 192, 139000, 200000, 200002 等）`);
+  } catch (err) {
+    console.warn('⚠️ 扫描 WABA 侧边栏 Edge 目录发生警告:', err.message);
+  }
+
+  fetchedRows = Array.from(fetchedMap.values());
 
   // Load existing data if available
   let existingData = { lastSyncedAt: '', items: [] };
@@ -537,7 +804,9 @@ export async function syncErrors() {
       solutionZh,
       severity,
       httpStatus,
-      docUrl: META_DOCS_URL,
+      docUrl: fetched?.source?.startsWith('waba_')
+        ? `${WABA_BASE_URL}${fetched.source.replace('waba_', '') === 'root' ? '' : fetched.source.replace('waba_', '')}`
+        : META_DOCS_URL,
       examplePayload,
     });
   }
@@ -545,46 +814,50 @@ export async function syncErrors() {
   const output = {
     lastSyncedAt: new Date().toISOString(),
     totalCount: mergedItems.length,
-    sourceUrl: META_DOCS_URL,
+    sourceUrl: `${META_DOCS_URL} + ${WABA_BASE_URL}`,
     items: mergedItems,
   };
 
   fs.writeFileSync(DATA_FILE, JSON.stringify(output, null, 2), 'utf-8');
-  console.log(`🎉 错误码知识库更新成功！共收录 ${mergedItems.length} 个错误码 -> ${DATA_FILE}`);
+  console.log(`🎉 错误码全量知识库更新成功！共收录 ${mergedItems.length} 个错误码 -> ${DATA_FILE}`);
   return output;
 }
 
 function inferCategory(code) {
+  if (code === 80007 || code === 80008) return 'rate_limit';
+  if (code === 104 || code === 190 || code === 200) return 'authentication';
+  if (code === 368 || code === 200008 || code === 131031) return 'account';
+  if (code === 192 || code === 200002 || code === 200005 || code === 139000) return 'template';
+  if (code === 300 || code === 200000 || (code >= 133000 && code < 134000) || (code >= 2593000 && code <= 2594000)) return 'registration';
   if (code >= 130000 && code < 131000) return 'rate_limit';
   if (code >= 131000 && code < 132000) {
     if (code === 131052 || code === 131053) return 'media';
     return 'messaging';
   }
   if (code >= 132000 && code < 133000) return 'template';
-  if (code >= 133000 && code < 134000) return 'registration';
-  if (code === 190 || code === 200) return 'authentication';
-  if (code === 368) return 'account';
+  if (code >= 134100 && code <= 134102) return 'template';
+  if (code === 134011 || code === 135000 || code === 1752041) return 'account';
   return 'general';
 }
 
 function getCategoryNameZh(cat) {
   const map = {
     messaging: '消息发送与接收',
-    template: '消息模板',
+    template: '消息模板与管理',
     rate_limit: '频率与流控限制',
     media: '多媒体上传与下载',
     authentication: '身份鉴权与令牌',
-    account: '商业账号与封禁',
-    registration: '号码注册与验证',
+    account: '商业账号与WABA',
+    registration: '号码注册与绑定',
     general: '常规 Graph API 错误',
   };
   return map[cat] || '其他';
 }
 
 function inferSeverity(code) {
-  if (code === 130429 || code === 80007 || code === 132069 || code === 131048) return 'rate_limit';
-  if (code === 190 || code === 368 || code === 132015 || code === 132016) return 'blocker';
-  if (code === 131000 || code === 131016 || code === 131057 || code === 133004) return 'service_unavailable';
+  if (code === 130429 || code === 80007 || code === 80008 || code === 132069 || code === 131048 || code === 134101) return 'rate_limit';
+  if (code === 190 || code === 368 || code === 132015 || code === 132016 || code === 139000 || code === 200000 || code === 200008) return 'blocker';
+  if (code === 131000 || code === 131016 || code === 131057 || code === 133004 || code === 134102 || code === 135000) return 'service_unavailable';
   return 'client_error';
 }
 

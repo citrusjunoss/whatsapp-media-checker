@@ -28,24 +28,26 @@ export interface ErrorDataset {
 
 export const ERROR_CATEGORIES = [
   { id: 'all', nameZh: '全部错误', count: (errorsData as ErrorDataset).items.length },
-  { id: 'messaging', nameZh: '消息发送 (131xxx)' },
-  { id: 'template', nameZh: '消息模板 (132xxx)' },
-  { id: 'rate_limit', nameZh: '频率限制 (130xxx)' },
-  { id: 'media', nameZh: '媒体处理 (131052/53)' },
+  { id: 'messaging', nameZh: '消息发送与接收' },
+  { id: 'template', nameZh: '消息模板与管理 (192/132xxx)' },
+  { id: 'rate_limit', nameZh: '频率与流控限制 (80008)' },
+  { id: 'media', nameZh: '多媒体处理 (131052/53)' },
   { id: 'authentication', nameZh: '身份鉴权与Token (190)' },
-  { id: 'account', nameZh: '商业账号与封禁 (368)' },
-  { id: 'registration', nameZh: '号码注册与验证 (133xxx)' },
+  { id: 'account', nameZh: '商业账号与WABA (368)' },
+  { id: 'registration', nameZh: '号码注册与绑定 (200000)' },
   { id: 'general', nameZh: '常规 Graph API' },
 ];
 
 export const POPULAR_ERROR_CODES = [
   { code: 131047, label: '131047 · 24小时窗口超时', tag: '高频' },
   { code: 131026, label: '131026 · 消息无法送达', tag: '高频' },
+  { code: 192, label: '192 · 模板创建号码无效', tag: '模板' },
   { code: 130429, label: '130429 · 限流 Rate Limit', tag: '高频' },
   { code: 132000, label: '132000 · 模板变量不匹配', tag: '模板' },
-  { code: 132001, label: '132001 · 模板未批准/不存在', tag: '模板' },
+  { code: 80008, label: '80008 · WABA 账号频控', tag: '限流' },
   { code: 190, label: '190 · Token 过期失效', tag: '鉴权' },
   { code: 131053, label: '131053 · 媒体上传失败', tag: '媒体' },
+  { code: 200000, label: '200000 · 号码绑定失败', tag: '配置' },
   { code: 131042, label: '131042 · 支付/账单异常', tag: '账号' },
 ];
 

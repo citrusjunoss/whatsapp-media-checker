@@ -52,6 +52,30 @@ describe('WhatsApp Error Lookup Engine', () => {
     expect(templateErrors.some((i) => i.code === 132001)).toBe(true);
   });
 
+  it('should include WABA Graph API management and template creation errors (e.g. 192, 139000, 200000, 80008)', () => {
+    // 192 Invalid phone number in template
+    const res192 = searchErrors('192', 'all', dataset.items);
+    expect(res192.length).toBeGreaterThanOrEqual(1);
+    expect(res192[0].code).toBe(192);
+    expect(res192[0].category).toBe('template');
+    expect(res192[0].titleZh).toContain('模板');
+
+    // 139000 Blocked by integrity
+    const res139000 = searchErrors('139000', 'all', dataset.items);
+    expect(res139000.length).toBeGreaterThanOrEqual(1);
+    expect(res139000[0].titleZh).toContain('合规拦截');
+
+    // 200000 Cannot add phone number to WABA
+    const res200000 = searchErrors('200000', 'all', dataset.items);
+    expect(res200000.length).toBeGreaterThanOrEqual(1);
+    expect(res200000[0].category).toBe('registration');
+
+    // 80008 WABA account rate limit
+    const res80008 = searchErrors('80008', 'all', dataset.items);
+    expect(res80008.length).toBeGreaterThanOrEqual(1);
+    expect(res80008[0].category).toBe('rate_limit');
+  });
+
   it('should ensure each error item contains essential diagnostic properties', () => {
     dataset.items.forEach((item) => {
       expect(item.code).toBeTypeOf('number');
