@@ -1,0 +1,38 @@
+name: Sync WhatsApp API Error Codes from Meta
+
+on:
+  schedule:
+    # Runs every Monday at 02:00 UTC (10:00 AM Beijing time)
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-errors:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Error Sync Script
+        run: node scripts/sync-errors.mjs
+
+      - name: Check for changes and commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain src/data/whatsapp-errors.json)" ]; then
+            echo "Changes detected in WhatsApp error codes, committing..."
+            git add src/data/whatsapp-errors.json
+            git commit -m "chore(data): auto-sync latest WhatsApp error codes from Meta"
+            git push origin main
+          else
+            echo "No changes in WhatsApp error codes."
+          fi
