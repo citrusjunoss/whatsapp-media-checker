@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "sync:errors": "node scripts/sync-errors.mjs"
+    "sync:errors": "node scripts/sync-errors.mjs",
+    "sync:aliyun": "node scripts/sync-aliyun-errors.mjs",
+    "ingest:issue": "node scripts/ingest-issue-error.mjs"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
