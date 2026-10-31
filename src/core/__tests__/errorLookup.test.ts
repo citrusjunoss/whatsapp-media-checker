@@ -83,6 +83,30 @@ describe('WhatsApp Error Lookup Engine with Multi-Provider Support', () => {
     expect(templateErrors.some((i) => i.code === 'isv.TEMPLATE_PARAM_INVALID')).toBe(true);
   });
 
+  it('should support drilldown official relatedLinks on Meta errors with clickable URLs', () => {
+    // Check Code 0, 3, 10, 190, 200
+    const code0 = dataset.items.find((i) => i.code === 0);
+    expect(code0?.relatedLinks).toBeDefined();
+    expect(code0?.relatedLinks?.some((l) => l.url.includes('access-tokens'))).toBe(true);
+
+    const code3 = dataset.items.find((i) => i.code === 3);
+    expect(code3?.relatedLinks).toBeDefined();
+    expect(code3?.relatedLinks?.some((l) => l.url.includes('tools/debug/accesstoken'))).toBe(true);
+
+    const code10 = dataset.items.find((i) => i.code === 10);
+    expect(code10?.relatedLinks).toBeDefined();
+    expect(code10?.relatedLinks?.some((l) => l.url.includes('whatsapp-business-encryption'))).toBe(true);
+
+    const code190 = dataset.items.find((i) => i.code === 190);
+    expect(code190?.relatedLinks).toBeDefined();
+    expect(code190?.relatedLinks?.length).toBeGreaterThanOrEqual(1);
+
+    // Search by related link title or keyword
+    const resDebugger = searchErrors('accesstoken', 'all', dataset.items);
+    expect(resDebugger.length).toBeGreaterThanOrEqual(1);
+    expect(resDebugger.some((i) => i.code === 3 || i.code === 10 || i.code === 190)).toBe(true);
+  });
+
   it('should ensure each error item contains essential diagnostic properties', () => {
     dataset.items.forEach((item) => {
       expect(['string', 'number']).toContain(typeof item.code);

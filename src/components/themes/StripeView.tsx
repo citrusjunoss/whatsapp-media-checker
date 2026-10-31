@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
+import { FormattedText } from '../common/FormattedText';
 import {
   getLoadedErrorDataset,
   searchErrors,
@@ -719,11 +720,40 @@ export const StripeView: React.FC<StripeViewProps> = ({
                           <Square className="w-4 h-4 text-[#94a3b8]" />
                         )}
                       </button>
-                      <span className="leading-snug">{step}</span>
+                      <span className="leading-snug">
+                        <FormattedText text={step} linkColor="text-[#635bff] hover:text-[#4f46e5] underline font-medium" />
+                      </span>
                     </div>
                   );
                 })}
             </div>
+
+            {/* Official Drill-down Guides & Tools */}
+            {drawerItem.relatedLinks && drawerItem.relatedLinks.length > 0 && (
+              <div className="space-y-2">
+                <div className="font-semibold text-[#0f172a] text-[11px] uppercase flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-[#635bff]">
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>官方二级下钻指引与工具 (Official Drill-down)</span>
+                  </span>
+                  <span className="text-[10px] text-[#64748b] font-normal">点击直达官方页面</span>
+                </div>
+                <div className="space-y-1.5">
+                  {drawerItem.relatedLinks.map((link, idx) => (
+                    <a
+                      key={idx}
+                      href={link.url}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="flex items-center justify-between p-2.5 rounded-md border border-[#e2e8f0] bg-white hover:bg-[#f8fafc] hover:border-[#635bff]/40 text-xs text-[#0f172a] transition-all group"
+                    >
+                      <span className="font-medium text-[#635bff] group-hover:underline truncate">{link.title}</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-[#94a3b8] group-hover:text-[#635bff] shrink-0 ml-2" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Reason details */}
             <div className="space-y-1">
@@ -731,7 +761,7 @@ export const StripeView: React.FC<StripeViewProps> = ({
                 深度故障机制 (Technical Reason)
               </div>
               <div className="p-3 rounded-md bg-[#f8fafc] border border-[#e2e8f0] text-[#475569] leading-relaxed">
-                {drawerItem.detailsZh}
+                <FormattedText text={drawerItem.detailsZh} linkColor="text-[#635bff] hover:underline" />
               </div>
             </div>
 

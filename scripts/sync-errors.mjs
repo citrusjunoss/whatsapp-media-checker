@@ -32,14 +32,64 @@ const WABA_EDGES = [
 // Curated high-quality bilingual mappings and metadata for WhatsApp error codes
 const ERROR_KNOWLEDGE_BASE = {
   0: {
-    category: 'general',
-    categoryNameZh: '网络与常规错误',
-    titleEn: 'Auth / Network / Unknown Error',
-    titleZh: '认证或网络异常',
-    detailsZh: '调用 Meta Graph API 时发生网络中断、DNS 解析失败或未授权请求。',
-    solutionZh: '检查网络连接，核对 Access Token 授权头与 API Version 是否正确。',
+    category: 'authentication',
+    categoryNameZh: '身份鉴权与令牌',
+    titleEn: 'Unable to Authenticate App User',
+    titleZh: '应用用户认证失败或令牌失效',
+    detailsZh: '调用 Meta Graph API 时发生认证失败。通常意味着 Access Token 已过期、失效，或应用用户修改了安全设置禁止所有应用访问其数据。',
+    solutionZh: '核对 Access Token 授权头；若令牌失效，请[获取新 Access Token](https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens#system-user-access-tokens) 重新授权。',
     severity: 'client_error',
     httpStatus: 400,
+    relatedLinks: [
+      {
+        title: '获取新 Access Token (System User)',
+        url: 'https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens#system-user-access-tokens',
+      },
+    ],
+  },
+  3: {
+    category: 'authentication',
+    categoryNameZh: '身份鉴权与令牌',
+    titleEn: 'Capability or Permissions Issue',
+    titleZh: '应用能力或接口权限不足',
+    detailsZh: '当前 Access Token 缺少调用该 WhatsApp 端点所需的授权范围或权限。',
+    solutionZh: '使用 [Access Token 调试工具 (Token Debugger)](https://developers.facebook.com/tools/debug/accesstoken) 检查 App 所获权限；查阅 [身份鉴权与授权错误官方指南 (Authentication & Authorization Errors)](https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization) 排查端点所需权限。',
+    severity: 'blocker',
+    httpStatus: 403,
+    relatedLinks: [
+      {
+        title: 'Access Token 调试工具 (Token Debugger)',
+        url: 'https://developers.facebook.com/tools/debug/accesstoken',
+      },
+      {
+        title: '身份鉴权与授权错误官方指南',
+        url: 'https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization',
+      },
+    ],
+  },
+  10: {
+    category: 'authentication',
+    categoryNameZh: '身份鉴权与令牌',
+    titleEn: 'Permission Denied or Removed',
+    titleZh: '接口权限未授予或已被撤销',
+    detailsZh: '请求被拒绝，原因可能是权限未授予或已被撤销，或者账号不满足调用该 API 的资质要求。',
+    solutionZh: '1. 使用 [Access Token 调试器](https://developers.facebook.com/tools/debug/accesstoken) 验证当前令牌权限；2. 查阅 [身份鉴权与授权错误指南](https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization)；3. 若使用 WhatsApp Flows with Endpoint，确保用于[设置商业公钥 (Set Business Public Key)](https://developers.facebook.com/documentation/business-messaging/whatsapp/flows/cloud-api/reference/whatsapp-business-encryption#set-business-public-key) 的电话号码已加入白名单；4. 检查账号是否满足端点资质要求。',
+    severity: 'blocker',
+    httpStatus: 403,
+    relatedLinks: [
+      {
+        title: 'Access Token 调试工具 (Token Debugger)',
+        url: 'https://developers.facebook.com/tools/debug/accesstoken',
+      },
+      {
+        title: '身份鉴权与授权错误官方指南',
+        url: 'https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization',
+      },
+      {
+        title: '设置商业公钥指引 (Set Business Public Key)',
+        url: 'https://developers.facebook.com/documentation/business-messaging/whatsapp/flows/cloud-api/reference/whatsapp-business-encryption#set-business-public-key',
+      },
+    ],
   },
   100: {
     category: 'general',
@@ -57,19 +107,39 @@ const ERROR_KNOWLEDGE_BASE = {
     titleEn: 'Access Token Expired or Invalid',
     titleZh: '访问令牌已过期或失效',
     detailsZh: '当前使用的 System User 或 User Access Token 已过期、被重置或已被撤销权限。',
-    solutionZh: '在 Meta 商务管理平台重新生成永久系统用户访问令牌（Permanent System User Token），或使用 Token Debugger 验证令牌有效性。',
+    solutionZh: '前往 [获取 Access Token 官方指引](https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens) 在 Meta 商务管理平台重新生成永久系统用户访问令牌（Permanent System User Token），或使用 [Token Debugger](https://developers.facebook.com/tools/debug/accesstoken) 验证令牌有效性。',
     severity: 'blocker',
     httpStatus: 401,
+    relatedLinks: [
+      {
+        title: '获取 Access Token 官方文档',
+        url: 'https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens',
+      },
+      {
+        title: 'Access Token 调试工具 (Token Debugger)',
+        url: 'https://developers.facebook.com/tools/debug/accesstoken',
+      },
+    ],
   },
   200: {
     category: 'authentication',
     categoryNameZh: '身份鉴权与令牌',
-    titleEn: 'Permissions Error',
-    titleZh: '应用权限不足',
-    detailsZh: '调用该接口所需权限未授予给当前 Access Token（例如缺少 whatsapp_business_messaging 或 whatsapp_business_management 权限）。',
-    solutionZh: '在 Meta App Dashboard 中检查 App 权限配置，确保系统用户分配了对应 WhatsApp Business 资产的完全管理权限。',
+    titleEn: 'Permissions Error / No Access Token Provided',
+    titleZh: '应用权限不足或缺少 Access Token',
+    detailsZh: '调用该接口所需权限未授予给当前 Access Token（例如缺少 whatsapp_business_messaging 或 whatsapp_business_management 权限），或请求中未携带有效的 Access Token。',
+    solutionZh: '确保请求中携带有效的 Access Token。参考 [Access Tokens 官方文档](https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens)；在 Meta App Dashboard 检查应用权限配置，或使用 [Access Token 调试工具](https://developers.facebook.com/tools/debug/accesstoken) 验证权限。',
     severity: 'blocker',
     httpStatus: 403,
+    relatedLinks: [
+      {
+        title: 'Access Tokens 官方文档',
+        url: 'https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens',
+      },
+      {
+        title: 'Access Token 调试工具 (Token Debugger)',
+        url: 'https://developers.facebook.com/tools/debug/accesstoken',
+      },
+    ],
   },
   368: {
     category: 'account',
@@ -77,9 +147,15 @@ const ERROR_KNOWLEDGE_BASE = {
     titleEn: 'Temporarily Blocked for Policy Violation',
     titleZh: '账号因违反 Meta 政策被临时封禁',
     detailsZh: '由于发送内容被用户大量举报、违反 WhatsApp 商业通讯准则或触发反垃圾风控，账号已被临时限制发信。',
-    solutionZh: '停止批量推送营销内容，登录 WhatsApp Manager 查看违规警告，并在 Meta 商务管理平台“账户品质”页面提交申诉。',
+    solutionZh: '立即停止批量推送营销内容，登录 WhatsApp Manager 查看违规警告，并查阅 [Meta 政策违规与申诉指南 (Policy Enforcement)](https://developers.facebook.com/documentation/business-messaging/whatsapp/policy-enforcement) 了解恢复步骤与提交官方申诉。',
     severity: 'blocker',
     httpStatus: 403,
+    relatedLinks: [
+      {
+        title: 'Meta 政策违规与申诉指南 (Policy Enforcement)',
+        url: 'https://developers.facebook.com/documentation/business-messaging/whatsapp/policy-enforcement',
+      },
+    ],
   },
   130429: {
     category: 'rate_limit',
@@ -653,6 +729,148 @@ const ERROR_KNOWLEDGE_BASE = {
   },
 };
 
+function cleanText(str) {
+  if (!str) return '';
+  return str
+    .replace(/&lt;br\s*\/?&gt;/gi, '\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&nbsp;/g, ' ')
+    .trim();
+}
+
+function extractLinksFromMarkdown(text) {
+  if (!text) return [];
+  const mdRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+  const links = [];
+  let m;
+  while ((m = mdRegex.exec(text)) !== null) {
+    links.push({ title: m[1].trim(), url: m[2].trim() });
+  }
+  return links;
+}
+
+function deduplicateLinks(links) {
+  const seen = new Set();
+  const res = [];
+  for (const l of links || []) {
+    if (!l || !l.url || seen.has(l.url)) continue;
+    seen.add(l.url);
+    res.push({
+      title: l.title || '官方指引文档',
+      url: l.url,
+    });
+  }
+  return res;
+}
+
+function parseMetaAstFromHtml(html) {
+  const scriptTags = [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)];
+  let innerObj = null;
+  for (const st of scriptTags) {
+    if (st[1].includes('We were unable to authenticate the app user')) {
+      try {
+        const data = JSON.parse(st[1]);
+        function findInner(node) {
+          if (!node) return;
+          if (typeof node === 'string' && node.includes('We were unable to authenticate the app user')) {
+            try { innerObj = JSON.parse(node); } catch {}
+            return;
+          }
+          if (Array.isArray(node)) node.forEach(findInner);
+          else if (typeof node === 'object') Object.values(node).forEach(findInner);
+        }
+        findInner(data);
+      } catch {}
+      break;
+    }
+  }
+
+  if (!innerObj) return [];
+
+  function extractTextAndLinks(node) {
+    let text = '';
+    let links = [];
+    if (!node) return { text, links };
+    if (typeof node === 'string') return { text: node, links: [] };
+    if (typeof node === 'number') return { text: String(node), links: [] };
+
+    if (node.type === 'DMCCommonA') {
+      const href = node.props?.href || '';
+      const childRes = extractTextAndLinks(node.children);
+      const linkText = childRes.text.trim();
+      const fullHref = href.startsWith('http') ? href : `https://developers.facebook.com${href}`;
+      links.push({ title: linkText, url: fullHref });
+      text += `[${linkText}](${fullHref})`;
+      return { text, links };
+    }
+
+    if (Array.isArray(node)) {
+      for (const c of node) {
+        const r = extractTextAndLinks(c);
+        text += r.text;
+        links.push(...r.links);
+      }
+    } else if (node.children) {
+      const r = extractTextAndLinks(node.children);
+      text += r.text;
+      links.push(...r.links);
+    }
+    return { text, links };
+  }
+
+  function findTrs(node, trs = []) {
+    if (!node || typeof node !== 'object') return trs;
+    if (node.type === 'DMCCommonTr') trs.push(node);
+    if (Array.isArray(node)) node.forEach((n) => findTrs(n, trs));
+    else if (node.children) findTrs(node.children, trs);
+    else Object.values(node).forEach((n) => findTrs(n, trs));
+    return trs;
+  }
+
+  const trs = findTrs(innerObj);
+  const rows = [];
+  for (const tr of trs) {
+    const tds = (tr.children || []).filter((c) => c.type === 'DMCCommonTd');
+    if (tds.length >= 2) {
+      const col0 = extractTextAndLinks(tds[0]);
+      const codeMatch = col0.text.match(/\b(\d+)\b/);
+      if (codeMatch) {
+        const code = parseInt(codeMatch[1], 10);
+        let details = '';
+        let solution = '';
+        let links = [];
+        if (tds.length === 2) {
+          const c1 = extractTextAndLinks(tds[1]);
+          solution = c1.text;
+          links = c1.links;
+        } else if (tds.length >= 3) {
+          const c1 = extractTextAndLinks(tds[1]);
+          const c2 = extractTextAndLinks(tds[2]);
+          details = c1.text;
+          solution = c2.text;
+          links = [...c1.links, ...c2.links];
+        }
+
+        details = cleanText(details);
+        solution = cleanText(solution);
+
+        rows.push({
+          code,
+          details,
+          solution,
+          links: deduplicateLinks(links),
+          source: 'cloud_api_master',
+        });
+      }
+    }
+  }
+
+  return rows;
+}
+
 export async function syncErrors() {
   console.log('🔄 正在同步 WhatsApp 错误码（全量融合来源：Cloud API 统一手册 + WABA 侧边栏所有 Edge 目录）...');
   let fetchedRows = [];
@@ -661,29 +879,41 @@ export async function syncErrors() {
   // 1. Fetch Cloud API Master Error Codes Doc (support redirect)
   try {
     let res = await fetch(META_DOCS_URL, {
-      headers: { 'User-Agent': 'curl/8.1.2', 'Accept': '*/*' },
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 'Accept': '*/*' },
     });
     if (!res.ok) {
       res = await fetch(META_DOCS_FALLBACK_URL, {
-        headers: { 'User-Agent': 'curl/8.1.2', 'Accept': '*/*' },
+        headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 'Accept': '*/*' },
       });
     }
 
     if (res.ok) {
       const text = await res.text();
-      const tableRowRegex = /\|\s*`?(\d+)`?\s*\|\s*([^|]+)\|\s*([^|]+)\|/g;
-      let match;
-      let count = 0;
-      while ((match = tableRowRegex.exec(text)) !== null) {
-        const code = parseInt(match[1], 10);
-        const details = match[2].trim().replace(/<br>/g, '\n').replace(/&#039;/g, "'").replace(/&quot;/g, '"');
-        const solution = match[3].trim().replace(/<br>/g, '\n').replace(/&#039;/g, "'").replace(/&quot;/g, '"');
-        if (!isNaN(code)) {
-          fetchedMap.set(code, { code, details, solution, source: 'cloud_api_master' });
-          count++;
+      const astRows = parseMetaAstFromHtml(text);
+      if (astRows.length > 0) {
+        for (const row of astRows) {
+          fetchedMap.set(row.code, row);
         }
+        console.log(`✅ [1/2] 成功从 WhatsApp Cloud API 官方手册 AST 解析到 ${astRows.length} 条错误码（含完整下钻链接）`);
+      } else {
+        const tableRowRegex = /\|\s*`?(\d+)`?\s*\|\s*([^|]+)\|\s*([^|]+)\|/g;
+        let match;
+        let count = 0;
+        while ((match = tableRowRegex.exec(text)) !== null) {
+          const code = parseInt(match[1], 10);
+          const details = cleanText(match[2]);
+          const solution = cleanText(match[3]);
+          if (!isNaN(code)) {
+            const links = deduplicateLinks([
+              ...extractLinksFromMarkdown(details),
+              ...extractLinksFromMarkdown(solution),
+            ]);
+            fetchedMap.set(code, { code, details, solution, links, source: 'cloud_api_master' });
+            count++;
+          }
+        }
+        console.log(`✅ [1/2] 成功通过正则从 WhatsApp Cloud API 手册解析到 ${count} 条错误码`);
       }
-      console.log(`✅ [1/2] 成功从 WhatsApp Cloud API 官方手册解析到 ${count} 条错误码`);
     } else {
       console.warn(`⚠️ 无法直接访问 Meta 官方手册 (HTTP ${res.status})，将使用内置权威知识库。`);
     }
@@ -707,8 +937,14 @@ export async function syncErrors() {
             const trs = [...t[1].matchAll(/<tr><td>(\d+)<\/td><td>(.*?)<\/td><\/tr>/gis)];
             for (const tr of trs) {
               const code = parseInt(tr[1], 10);
-              const details = tr[2].replace(/<[^>]+>/g, '').replace(/&#039;/g, "'").replace(/&quot;/g, '"').trim();
-              codes.push({ code, details, solution: `Refer to WhatsApp Graph API Reference (${edge || 'root'}).`, source: `waba_${edge || 'root'}` });
+              const details = cleanText(tr[2].replace(/<[^>]+>/g, ''));
+              codes.push({
+                code,
+                details,
+                solution: `Refer to WhatsApp Graph API Reference (${edge || 'root'}).`,
+                links: [],
+                source: `waba_${edge || 'root'}`,
+              });
             }
           }
           return codes;
@@ -742,22 +978,31 @@ export async function syncErrors() {
     }
   }
 
-  const existingMap = new Map();
+  // Preserve non-Meta items (such as Aliyun ChatApp, Twilio, etc.)
+  const nonMetaItems = (existingData.items || []).filter(
+    (item) => item.provider && item.provider !== 'meta'
+  );
+  console.log(`[SYNC] 保留已有三方服务商错误码（如阿里云）：${nonMetaItems.length} 条`);
+
+  // Existing Meta items map
+  const existingMetaMap = new Map();
   for (const item of existingData.items || []) {
-    existingMap.set(item.code, item);
+    if (!item.provider || item.provider === 'meta') {
+      existingMetaMap.set(Number(item.code), item);
+    }
   }
 
-  // Build merged items
-  const allCodes = new Set([
+  // Build merged Meta items
+  const allMetaCodes = new Set([
     ...Object.keys(ERROR_KNOWLEDGE_BASE).map(Number),
     ...fetchedRows.map((r) => r.code),
-    ...existingMap.keys(),
+    ...existingMetaMap.keys(),
   ]);
 
-  const mergedItems = [];
-  for (const code of Array.from(allCodes).sort((a, b) => a - b)) {
+  const mergedMetaItems = [];
+  for (const code of Array.from(allMetaCodes).sort((a, b) => a - b)) {
     const kb = ERROR_KNOWLEDGE_BASE[code] || {};
-    const existing = existingMap.get(code) || {};
+    const existing = existingMetaMap.get(code) || {};
     const fetched = fetchedRows.find((r) => r.code === code);
 
     const category = kb.category || existing.category || inferCategory(code);
@@ -766,14 +1011,32 @@ export async function syncErrors() {
     const titleEn = kb.titleEn || existing.titleEn || `Error ${code}`;
     const titleZh = kb.titleZh || existing.titleZh || `错误码 ${code}`;
 
-    const detailsEn = fetched?.details || existing.detailsEn || kb.detailsEn || 'No official description provided.';
-    const detailsZh = kb.detailsZh || existing.detailsZh || detailsEn;
+    const detailsEn = cleanText(fetched?.details || existing.detailsEn || kb.detailsEn || 'No official description provided.');
+    const detailsZh = cleanText(kb.detailsZh || existing.detailsZh || detailsEn);
 
-    const solutionEn = fetched?.solution || existing.solutionEn || kb.solutionEn || 'Refer to WhatsApp Business Platform documentation.';
-    const solutionZh = kb.solutionZh || existing.solutionZh || solutionEn;
+    const solutionEn = cleanText(fetched?.solution || existing.solutionEn || kb.solutionEn || 'Refer to WhatsApp Business Platform documentation.');
+    const solutionZh = cleanText(kb.solutionZh || existing.solutionZh || solutionEn);
 
     const severity = kb.severity || existing.severity || inferSeverity(code);
     const httpStatus = kb.httpStatus || existing.httpStatus || 400;
+
+    const docUrl = fetched?.source?.startsWith('waba_')
+      ? `${WABA_BASE_URL}${fetched.source.replace('waba_', '') === 'root' ? '' : fetched.source.replace('waba_', '')}`
+      : META_DOCS_URL;
+
+    // Merge and deduplicate all relatedLinks:
+    // 1. From KB curated relatedLinks
+    // 2. From official AST parsed links
+    // 3. From markdown links in solutionZh, detailsZh, solutionEn
+    // 4. From existing item's relatedLinks
+    const relatedLinks = deduplicateLinks([
+      ...(kb.relatedLinks || []),
+      ...(fetched?.links || []),
+      ...extractLinksFromMarkdown(solutionZh),
+      ...extractLinksFromMarkdown(detailsZh),
+      ...extractLinksFromMarkdown(solutionEn),
+      ...(existing.relatedLinks || []),
+    ]);
 
     const examplePayload = JSON.stringify(
       {
@@ -792,8 +1055,10 @@ export async function syncErrors() {
       2
     );
 
-    mergedItems.push({
+    mergedMetaItems.push({
       code,
+      provider: 'meta',
+      providerNameZh: 'Meta WhatsApp 官方',
       category,
       categoryNameZh,
       titleEn,
@@ -804,22 +1069,23 @@ export async function syncErrors() {
       solutionZh,
       severity,
       httpStatus,
-      docUrl: fetched?.source?.startsWith('waba_')
-        ? `${WABA_BASE_URL}${fetched.source.replace('waba_', '') === 'root' ? '' : fetched.source.replace('waba_', '')}`
-        : META_DOCS_URL,
+      docUrl,
+      ...(relatedLinks.length > 0 ? { relatedLinks } : {}),
       examplePayload,
     });
   }
 
+  // Final combined dataset: Meta errors + Third-party errors
+  const finalItems = [...mergedMetaItems, ...nonMetaItems];
   const output = {
     lastSyncedAt: new Date().toISOString(),
-    totalCount: mergedItems.length,
+    totalCount: finalItems.length,
     sourceUrl: `${META_DOCS_URL} + ${WABA_BASE_URL}`,
-    items: mergedItems,
+    items: finalItems,
   };
 
   fs.writeFileSync(DATA_FILE, JSON.stringify(output, null, 2), 'utf-8');
-  console.log(`🎉 错误码全量知识库更新成功！共收录 ${mergedItems.length} 个错误码 -> ${DATA_FILE}`);
+  console.log(`🎉 错误码全量知识库更新成功！Meta 错误码：${mergedMetaItems.length} 条（其中包含二级下钻链接：${mergedMetaItems.filter((i) => i.relatedLinks?.length).length} 条），三方服务商错误码：${nonMetaItems.length} 条，全量总计：${finalItems.length} 条 -> ${DATA_FILE}`);
   return output;
 }
 

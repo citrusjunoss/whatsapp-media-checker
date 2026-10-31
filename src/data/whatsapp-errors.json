@@ -1,29 +1,35 @@
 {
-  "lastSyncedAt": "2026-10-31T03:45:07.423Z",
-  "totalCount": 401,
+  "lastSyncedAt": "2026-10-31T06:30:53.583Z",
+  "totalCount": 415,
   "sourceUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes + https://developers.facebook.com/docs/graph-api/reference/whats-app-business-account/",
   "items": [
     {
+      "code": 0,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 0,
-      "category": "general",
-      "categoryNameZh": "网络与常规错误",
-      "titleEn": "Auth / Network / Unknown Error",
-      "titleZh": "认证或网络异常",
-      "detailsEn": "`We were unable to authenticate the app user.`",
-      "detailsZh": "调用 Meta Graph API 时发生网络中断、DNS 解析失败或未授权请求。",
+      "category": "authentication",
+      "categoryNameZh": "身份鉴权与令牌",
+      "titleEn": "Unable to Authenticate App User",
+      "titleZh": "应用用户认证失败或令牌失效",
+      "detailsEn": "We were unable to authenticate the app user.",
+      "detailsZh": "调用 Meta Graph API 时发生认证失败。通常意味着 Access Token 已过期、失效，或应用用户修改了安全设置禁止所有应用访问其数据。",
       "solutionEn": "Typically this means the included access token has expired, been invalidated, or the app user has changed a setting to prevent all apps from accessing their data. [Get a new access token](https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens#system-user-access-tokens).",
-      "solutionZh": "检查网络连接，核对 Access Token 授权头与 API Version 是否正确。",
+      "solutionZh": "核对 Access Token 授权头；若令牌失效，请[获取新 Access Token](https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens#system-user-access-tokens) 重新授权。",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Auth / Network / Unknown Error\",\n    \"type\": \"OAuthException\",\n    \"code\": 0,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`We were unable to authenticate the app user.`\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "relatedLinks": [
+        {
+          "title": "获取新 Access Token (System User)",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens#system-user-access-tokens"
+        }
+      ],
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Unable to Authenticate App User\",\n    \"type\": \"OAuthException\",\n    \"code\": 0,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"We were unable to authenticate the app user.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 1,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 1,
       "category": "general",
       "categoryNameZh": "常规 Graph API 错误",
       "titleEn": "Error 1",
@@ -35,12 +41,18 @@
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "WhatsApp Business Platform Status",
+          "url": "https://metastatus.com/whatsapp-business-api"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 1\",\n    \"type\": \"OAuthException\",\n    \"code\": 1,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Invalid request or possible server error.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 2,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 2,
       "category": "general",
       "categoryNameZh": "常规 Graph API 错误",
       "titleEn": "Error 2",
@@ -52,63 +64,103 @@
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "WhatsApp Business Platform Status",
+          "url": "https://metastatus.com/whatsapp-business-api"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 2\",\n    \"type\": \"OAuthException\",\n    \"code\": 2,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Temporary due to downtime or due to being overloaded.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 3,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 3,
-      "category": "general",
-      "categoryNameZh": "常规 Graph API 错误",
-      "titleEn": "Error 3",
-      "titleZh": "错误码 3",
+      "category": "authentication",
+      "categoryNameZh": "身份鉴权与令牌",
+      "titleEn": "Capability or Permissions Issue",
+      "titleZh": "应用能力或接口权限不足",
       "detailsEn": "Capability or permissions issue.",
-      "detailsZh": "Capability or permissions issue.",
+      "detailsZh": "当前 Access Token 缺少调用该 WhatsApp 端点所需的授权范围或权限。",
       "solutionEn": "Use the [access token debugger](https://developers.facebook.com/tools/debug/accesstoken) to verify that your app has been granted the permissions required by the endpoint. See [Authentication and Authorization Errors](https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization).",
-      "solutionZh": "Use the [access token debugger](https://developers.facebook.com/tools/debug/accesstoken) to verify that your app has been granted the permissions required by the endpoint. See [Authentication and Authorization Errors](https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization).",
-      "severity": "client_error",
-      "httpStatus": 400,
+      "solutionZh": "使用 [Access Token 调试工具 (Token Debugger)](https://developers.facebook.com/tools/debug/accesstoken) 检查 App 所获权限；查阅 [身份鉴权与授权错误官方指南 (Authentication & Authorization Errors)](https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization) 排查端点所需权限。",
+      "severity": "blocker",
+      "httpStatus": 403,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 3\",\n    \"type\": \"OAuthException\",\n    \"code\": 3,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Capability or permissions issue.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "relatedLinks": [
+        {
+          "title": "Access Token 调试工具 (Token Debugger)",
+          "url": "https://developers.facebook.com/tools/debug/accesstoken"
+        },
+        {
+          "title": "身份鉴权与授权错误官方指南",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization"
+        }
+      ],
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Capability or Permissions Issue\",\n    \"type\": \"OAuthException\",\n    \"code\": 3,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Capability or permissions issue.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 4,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 4,
       "category": "general",
       "categoryNameZh": "常规 Graph API 错误",
       "titleEn": "Error 4",
       "titleZh": "错误码 4",
       "detailsEn": "The app has reached its API call rate limit.",
       "detailsZh": "The app has reached its API call rate limit.",
-      "solutionEn": "Load the app in the [App Dashboard](https://developers.facebook.com/apps) and view the **Application Rate Limit** section to verify that the app has reached its [rate limit](https://developers.facebook.com/docs/graph-api/overview/rate-limiting#wa-biz-api). If it has, try again later or reduce the frequency or amount of API queries the app is making.",
+      "solutionEn": "Load the app in the [App Dashboard](https://developers.facebook.com/apps) and view the Application Rate Limit section to verify that the app has reached its [rate limit](https://developers.facebook.com/docs/graph-api/overview/rate-limiting#wa-biz-api). If it has, try again later or reduce the frequency or amount of API queries the app is making.",
       "solutionZh": "Load the app in the [App Dashboard](https://developers.facebook.com/apps) and view the **Application Rate Limit** section to verify that the app has reached its [rate limit](https://developers.facebook.com/docs/graph-api/overview/rate-limiting#wa-biz-api). If it has, try again later or reduce the frequency or amount of API queries the app is making.",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "App Dashboard",
+          "url": "https://developers.facebook.com/apps"
+        },
+        {
+          "title": "rate limit",
+          "url": "https://developers.facebook.com/docs/graph-api/overview/rate-limiting#wa-biz-api"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 4\",\n    \"type\": \"OAuthException\",\n    \"code\": 4,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The app has reached its API call rate limit.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 10,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 10,
-      "category": "general",
-      "categoryNameZh": "常规 Graph API 错误",
-      "titleEn": "Error 10",
-      "titleZh": "错误码 10",
+      "category": "authentication",
+      "categoryNameZh": "身份鉴权与令牌",
+      "titleEn": "Permission Denied or Removed",
+      "titleZh": "接口权限未授予或已被撤销",
       "detailsEn": "Permission is either not granted or has been removed.",
-      "detailsZh": "Permission is either not granted or has been removed.",
-      "solutionEn": "Use the [access token debugger](https://developers.facebook.com/tools/debug/accesstoken) to verify that your app has been granted the permissions required by the endpoint.&lt;br&gt;&lt;br&gt;See [Authentication and Authorization Errors](https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization).&lt;br&gt;&lt;br&gt;For WhatsApp Flows with Endpoint - ensure that the phone number used to [set your business public key](https://developers.facebook.com/documentation/business-messaging/whatsapp/flows/cloud-api/reference/whatsapp-business-encryption#set-business-public-key) is allowlisted.&lt;br&gt;&lt;br&gt;Check the eligibility requirements for the API that you are trying to access. If you are not eligible to access the endpoints, you will receive this error code.",
-      "solutionZh": "Use the [access token debugger](https://developers.facebook.com/tools/debug/accesstoken) to verify that your app has been granted the permissions required by the endpoint.&lt;br&gt;&lt;br&gt;See [Authentication and Authorization Errors](https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization).&lt;br&gt;&lt;br&gt;For WhatsApp Flows with Endpoint - ensure that the phone number used to [set your business public key](https://developers.facebook.com/documentation/business-messaging/whatsapp/flows/cloud-api/reference/whatsapp-business-encryption#set-business-public-key) is allowlisted.&lt;br&gt;&lt;br&gt;Check the eligibility requirements for the API that you are trying to access. If you are not eligible to access the endpoints, you will receive this error code.",
-      "severity": "client_error",
-      "httpStatus": 400,
+      "detailsZh": "请求被拒绝，原因可能是权限未授予或已被撤销，或者账号不满足调用该 API 的资质要求。",
+      "solutionEn": "Use the [access token debugger](https://developers.facebook.com/tools/debug/accesstoken) to verify that your app has been granted the permissions required by the endpoint.See [Authentication and Authorization Errors](https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization).For WhatsApp Flows with Endpoint - ensure that the phone number used to [set your business public key](https://developers.facebook.com/documentation/business-messaging/whatsapp/flows/cloud-api/reference/whatsapp-business-encryption#set-business-public-key) is allowlisted.Check the eligibility requirements for the API that you are trying to access. If you are not eligible to access the endpoints, you will receive this error code.",
+      "solutionZh": "1. 使用 [Access Token 调试器](https://developers.facebook.com/tools/debug/accesstoken) 验证当前令牌权限；2. 查阅 [身份鉴权与授权错误指南](https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization)；3. 若使用 WhatsApp Flows with Endpoint，确保用于[设置商业公钥 (Set Business Public Key)](https://developers.facebook.com/documentation/business-messaging/whatsapp/flows/cloud-api/reference/whatsapp-business-encryption#set-business-public-key) 的电话号码已加入白名单；4. 检查账号是否满足端点资质要求。",
+      "severity": "blocker",
+      "httpStatus": 403,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 10\",\n    \"type\": \"OAuthException\",\n    \"code\": 10,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Permission is either not granted or has been removed.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "relatedLinks": [
+        {
+          "title": "Access Token 调试工具 (Token Debugger)",
+          "url": "https://developers.facebook.com/tools/debug/accesstoken"
+        },
+        {
+          "title": "身份鉴权与授权错误官方指南",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization"
+        },
+        {
+          "title": "设置商业公钥指引 (Set Business Public Key)",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/flows/cloud-api/reference/whatsapp-business-encryption#set-business-public-key"
+        }
+      ],
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Permission Denied or Removed\",\n    \"type\": \"OAuthException\",\n    \"code\": 10,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Permission is either not granted or has been removed.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 33,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 33,
       "category": "general",
       "categoryNameZh": "常规 Graph API 错误",
       "titleEn": "Error 33",
@@ -123,26 +175,26 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 33\",\n    \"type\": \"OAuthException\",\n    \"code\": 33,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The business phone number has been deleted.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 100,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 100,
       "category": "general",
       "categoryNameZh": "常规 Graph API 错误",
       "titleEn": "Invalid Parameter",
       "titleZh": "请求参数无效或缺失",
-      "detailsEn": "`(#100) Invalid parameter`",
+      "detailsEn": "(#100) Invalid parameter",
       "detailsZh": "请求体 JSON 或 URL 查询参数格式错误，缺少必填字段或传入了不支持的数据类型。",
-      "solutionEn": "`Message must be a template message.`",
+      "solutionEn": "Message must be a template message.",
       "solutionZh": "检查 API 请求体格式，核对 JSON 语法与必填字段。若上传媒体，确认 Content-Type 为 multipart/form-data。",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Invalid Parameter\",\n    \"type\": \"OAuthException\",\n    \"code\": 100,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`(#100) Invalid parameter`\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Invalid Parameter\",\n    \"type\": \"OAuthException\",\n    \"code\": 100,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"(#100) Invalid parameter\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 104,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 104,
       "category": "authentication",
       "categoryNameZh": "身份鉴权与令牌",
       "titleEn": "Incorrect Signature",
@@ -157,9 +209,9 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Incorrect Signature\",\n    \"type\": \"OAuthException\",\n    \"code\": 104,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Incorrect signature\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 190,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 190,
       "category": "authentication",
       "categoryNameZh": "身份鉴权与令牌",
       "titleEn": "Access Token Expired or Invalid",
@@ -167,16 +219,26 @@
       "detailsEn": "Your access token has expired.",
       "detailsZh": "当前使用的 System User 或 User Access Token 已过期、被重置或已被撤销权限。",
       "solutionEn": "Get a new [access token](https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens).",
-      "solutionZh": "在 Meta 商务管理平台重新生成永久系统用户访问令牌（Permanent System User Token），或使用 Token Debugger 验证令牌有效性。",
+      "solutionZh": "前往 [获取 Access Token 官方指引](https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens) 在 Meta 商务管理平台重新生成永久系统用户访问令牌（Permanent System User Token），或使用 [Token Debugger](https://developers.facebook.com/tools/debug/accesstoken) 验证令牌有效性。",
       "severity": "blocker",
       "httpStatus": 401,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "获取 Access Token 官方文档",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens"
+        },
+        {
+          "title": "Access Token 调试工具 (Token Debugger)",
+          "url": "https://developers.facebook.com/tools/debug/accesstoken"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Access Token Expired or Invalid\",\n    \"type\": \"OAuthException\",\n    \"code\": 190,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Your access token has expired.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 192,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 192,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Invalid Phone Number in Template Request",
@@ -191,26 +253,40 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Invalid Phone Number in Template Request\",\n    \"type\": \"OAuthException\",\n    \"code\": 192,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Invalid phone number\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 200,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 200,
       "category": "authentication",
       "categoryNameZh": "身份鉴权与令牌",
-      "titleEn": "Permissions Error",
-      "titleZh": "应用权限不足",
-      "detailsEn": "No access token was provided. The API returns the message \"Provide valid app ID\". This error occurs on certain GET endpoints (such as `whatsapp_business_profile`) when no token is included. Other endpoints may return error code 190 or 104 instead.",
-      "detailsZh": "调用该接口所需权限未授予给当前 Access Token（例如缺少 whatsapp_business_messaging 或 whatsapp_business_management 权限）。",
-      "solutionEn": "Ensure your request includes a valid access token. This is distinct from error code 190 (expired or invalid token). See [Access Tokens](https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens).",
-      "solutionZh": "在 Meta App Dashboard 中检查 App 权限配置，确保系统用户分配了对应 WhatsApp Business 资产的完全管理权限。",
+      "titleEn": "Permissions Error / No Access Token Provided",
+      "titleZh": "应用权限不足或缺少 Access Token",
+      "detailsEn": "Permission is either not granted or has been removed.",
+      "detailsZh": "调用该接口所需权限未授予给当前 Access Token（例如缺少 whatsapp_business_messaging 或 whatsapp_business_management 权限），或请求中未携带有效的 Access Token。",
+      "solutionEn": "Use the [access token debugger](https://developers.facebook.com/tools/debug/accesstoken) to verify that your app has been granted the permissions required by the endpoint. See [Authentication and Authorization Errors](https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization).",
+      "solutionZh": "确保请求中携带有效的 Access Token。参考 [Access Tokens 官方文档](https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens)；在 Meta App Dashboard 检查应用权限配置，或使用 [Access Token 调试工具](https://developers.facebook.com/tools/debug/accesstoken) 验证权限。",
       "severity": "blocker",
       "httpStatus": 403,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Permissions Error\",\n    \"type\": \"OAuthException\",\n    \"code\": 200,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"No access token was provided. The API returns the message \\\"Provide valid app ID\\\". This error occurs \"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "relatedLinks": [
+        {
+          "title": "Access Tokens 官方文档",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/access-tokens"
+        },
+        {
+          "title": "Access Token 调试工具 (Token Debugger)",
+          "url": "https://developers.facebook.com/tools/debug/accesstoken"
+        },
+        {
+          "title": "Authentication and Authorization Errors",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization"
+        }
+      ],
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Permissions Error / No Access Token Provided\",\n    \"type\": \"OAuthException\",\n    \"code\": 200,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Permission is either not granted or has been removed.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 300,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 300,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Edit Failure",
@@ -225,26 +301,32 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Edit Failure\",\n    \"type\": \"OAuthException\",\n    \"code\": 300,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Edit failure\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 368,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 368,
       "category": "account",
       "categoryNameZh": "商业账号与封禁",
       "titleEn": "Temporarily Blocked for Policy Violation",
       "titleZh": "账号因违反 Meta 政策被临时封禁",
-      "detailsEn": "`The WhatsApp Business Account associated with the app has been restricted or disabled for violating a platform policy.`",
+      "detailsEn": "The WhatsApp Business Account associated with the app has been restricted or disabled for violating a platform policy.",
       "detailsZh": "由于发送内容被用户大量举报、违反 WhatsApp 商业通讯准则或触发反垃圾风控，账号已被临时限制发信。",
       "solutionEn": "See the [Policy Enforcement](https://developers.facebook.com/documentation/business-messaging/whatsapp/policy-enforcement) document to learn about policy violations and how to resolve them.",
-      "solutionZh": "停止批量推送营销内容，登录 WhatsApp Manager 查看违规警告，并在 Meta 商务管理平台“账户品质”页面提交申诉。",
+      "solutionZh": "立即停止批量推送营销内容，登录 WhatsApp Manager 查看违规警告，并查阅 [Meta 政策违规与申诉指南 (Policy Enforcement)](https://developers.facebook.com/documentation/business-messaging/whatsapp/policy-enforcement) 了解恢复步骤与提交官方申诉。",
       "severity": "blocker",
       "httpStatus": 403,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Temporarily Blocked for Policy Violation\",\n    \"type\": \"OAuthException\",\n    \"code\": 368,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`The WhatsApp Business Account associated with the app has been restricted or disabled for violating\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "relatedLinks": [
+        {
+          "title": "Meta 政策违规与申诉指南 (Policy Enforcement)",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/policy-enforcement"
+        }
+      ],
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Temporarily Blocked for Policy Violation\",\n    \"type\": \"OAuthException\",\n    \"code\": 368,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The WhatsApp Business Account associated with the app has been restricted or disabled for violating \"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 2500,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 2500,
       "category": "general",
       "categoryNameZh": "常规 Graph API 错误",
       "titleEn": "Error Parsing Graph Query",
@@ -259,26 +341,32 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error Parsing Graph Query\",\n    \"type\": \"OAuthException\",\n    \"code\": 2500,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Error parsing graph query\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 80007,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 80007,
       "category": "rate_limit",
       "categoryNameZh": "频率与流控限制",
       "titleEn": "Rate Limit Exceeded",
       "titleZh": "调用频率超出应用限额",
-      "detailsEn": "`The WhatsApp Business Account has reached its rate limit.`",
+      "detailsEn": "The WhatsApp Business Account has reached its rate limit.",
       "detailsZh": "Meta 开发者应用级的全局调用次数超出设定的限制。",
       "solutionEn": "See WhatsApp Business account [Rate Limits](https://developers.facebook.com/documentation/business-messaging/whatsapp/about-the-platform#rate-limits). Try again later or reduce the frequency or amount of API queries the app is making.",
       "solutionZh": "暂停非核心请求，优化请求批处理，降低查询频次。",
       "severity": "rate_limit",
       "httpStatus": 429,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Rate Limit Exceeded\",\n    \"type\": \"OAuthException\",\n    \"code\": 80007,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`The WhatsApp Business Account has reached its rate limit.`\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "relatedLinks": [
+        {
+          "title": "Rate Limits",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/about-the-platform#rate-limits"
+        }
+      ],
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Rate Limit Exceeded\",\n    \"type\": \"OAuthException\",\n    \"code\": 80007,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The WhatsApp Business Account has reached its rate limit.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 80008,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 80008,
       "category": "rate_limit",
       "categoryNameZh": "频率与流控限制",
       "titleEn": "WABA Account Rate Limit Exceeded",
@@ -293,9 +381,9 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"WABA Account Rate Limit Exceeded\",\n    \"type\": \"OAuthException\",\n    \"code\": 80008,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"There have been too many calls to this WhatsApp Business account. Wait a bit and try again. For more\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 130403,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 130403,
       "category": "rate_limit",
       "categoryNameZh": "频率与流控限制",
       "titleEn": "Error 130403",
@@ -307,29 +395,41 @@
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Unblock a user",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/block-users/#unblock-a-user"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 130403\",\n    \"type\": \"OAuthException\",\n    \"code\": 130403,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Unable to deliver the message. This business has blocked the end user on WhatsApp\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 130429,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 130429,
       "category": "rate_limit",
       "categoryNameZh": "频率与流控限制",
       "titleEn": "Rate Limit Hit",
       "titleZh": "达到 API 速率限流或吞吐量上限 (Rate Limit Hit)",
       "detailsEn": "Cloud API message throughput has been reached.",
       "detailsZh": "向特定手机号或整个 WABA 账号发送消息的瞬时速率已达到并发限制或限流阈值（如 80 MPS 或 Tier 限制）。",
-      "solutionEn": "The app has reached the API's throughput limit. See [Throughput](https://developers.facebook.com/documentation/business-messaging/whatsapp/throughput). Try again later or reduce the frequency with which the app sends messages.",
+      "solutionEn": "The app has reached the API’s throughput limit. See [Throughput](https://developers.facebook.com/documentation/business-messaging/whatsapp/throughput). Try again later or reduce the frequency with which the app sends messages.",
       "solutionZh": "引入队列缓冲（如 Redis / RabbitMQ），降低并发频率进行限流调控，实施指数退避算法（Exponential Backoff）重试，或向 Meta 申请提升 Throughput 吞吐量。",
       "severity": "rate_limit",
       "httpStatus": 429,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Throughput",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/throughput"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Rate Limit Hit\",\n    \"type\": \"OAuthException\",\n    \"code\": 130429,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Cloud API message throughput has been reached.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 130472,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 130472,
       "category": "rate_limit",
       "categoryNameZh": "频率与流控限制",
       "titleEn": "Error 130472",
@@ -341,46 +441,72 @@
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "experiment",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/experiments"
+        },
+        {
+          "title": "Marketing Message Experiment",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/experiments#marketing-message-experiment"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 130472\",\n    \"type\": \"OAuthException\",\n    \"code\": 130472,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Message was not sent as part of an [experiment](https://developers.facebook.com/documentation/busine\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 130497,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 130497,
       "category": "rate_limit",
       "categoryNameZh": "频率与流控限制",
       "titleEn": "Error 130497",
       "titleZh": "错误码 130497",
-      "detailsEn": "`The WhatsApp Business Account is restricted from messaging to users in certain countries.`",
+      "detailsEn": "The WhatsApp Business Account is restricted from messaging to users in certain countries.",
       "detailsZh": "`The WhatsApp Business Account is restricted from messaging to users in certain countries.`",
       "solutionEn": "See [WhatsApp Business Messaging Policy](https://business.whatsapp.com/policy) for details on allowed countries for messaging in your business category.",
       "solutionZh": "See [WhatsApp Business Messaging Policy](https://business.whatsapp.com/policy) for details on allowed countries for messaging in your business category.",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 130497\",\n    \"type\": \"OAuthException\",\n    \"code\": 130497,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`The WhatsApp Business Account is restricted from messaging to users in certain countries.`\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "relatedLinks": [
+        {
+          "title": "WhatsApp Business Messaging Policy",
+          "url": "https://business.whatsapp.com/policy"
+        }
+      ],
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 130497\",\n    \"type\": \"OAuthException\",\n    \"code\": 130497,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The WhatsApp Business Account is restricted from messaging to users in certain countries.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131000,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131000,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "Something Went Wrong",
       "titleZh": "WhatsApp 服务内部异常",
       "detailsEn": "Message failed to send due to an unknown error.",
       "detailsZh": "Meta 内部服务在处理该条消息时发生未知异常或暂时性故障。",
-      "solutionEn": "Try again. If the error persists, open a [Direct Support](https://business.facebook.com/direct-support) ticket.&lt;br&gt;&lt;br&gt;For WhatsApp Flows with Endpoint - when [setting a business public key](https://developers.facebook.com/documentation/business-messaging/whatsapp/flows/cloud-api/reference/whatsapp-business-encryption#set-business-public-key), it either failed to calculate the signature, call the GraphQL endpoint, or the GraphQL endpoint returned an error.",
+      "solutionEn": "Try again. If the error persists, open a [Direct Support](https://business.facebook.com/direct-support) ticket.For WhatsApp Flows with Endpoint - when [setting a business public key](https://developers.facebook.com/documentation/business-messaging/whatsapp/flows/cloud-api/reference/whatsapp-business-encryption#set-business-public-key), it either failed to calculate the signature, call the GraphQL endpoint, or the GraphQL endpoint returned an error.",
       "solutionZh": "稍后重试该请求；同时关注 metastatus.com 查看 WhatsApp 官方服务是否处于故障维护状态。",
       "severity": "service_unavailable",
       "httpStatus": 500,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Direct Support",
+          "url": "https://business.facebook.com/direct-support"
+        },
+        {
+          "title": "setting a business public key",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/flows/cloud-api/reference/whatsapp-business-encryption#set-business-public-key"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Something Went Wrong\",\n    \"type\": \"OAuthException\",\n    \"code\": 131000,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Message failed to send due to an unknown error.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131005,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131005,
       "category": "authentication",
       "categoryNameZh": "身份鉴权与令牌",
       "titleEn": "Access Denied / Permission Not Granted",
@@ -392,19 +518,29 @@
       "severity": "blocker",
       "httpStatus": 403,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "access token debugger",
+          "url": "https://developers.facebook.com/tools/debug/accesstoken"
+        },
+        {
+          "title": "Authentication and authorization errors",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support#authentication-authorization"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Access Denied / Permission Not Granted\",\n    \"type\": \"OAuthException\",\n    \"code\": 131005,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Permission is either not granted or has been removed.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131008,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131008,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "Required Parameter Missing",
       "titleZh": "缺少必需的请求参数",
       "detailsEn": "The request is missing a required parameter.",
       "detailsZh": "请求中缺少此消息类型必须提供的参数（如 to、type、template、image.id 等）。",
-      "solutionEn": "See the endpoint's reference to determine which parameters are required.",
+      "solutionEn": "See the endpoint’s reference to determine which parameters are required.",
       "solutionZh": "对照官方 API 文档检查请求体，确保传入了 messaging_product: \"whatsapp\" 以及对应类型的数据对象。",
       "severity": "client_error",
       "httpStatus": 400,
@@ -412,26 +548,26 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Required Parameter Missing\",\n    \"type\": \"OAuthException\",\n    \"code\": 131008,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The request is missing a required parameter.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131009,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131009,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "Parameter Value Invalid",
       "titleZh": "参数值不合法",
-      "detailsEn": "`(#131009) Parameter value is not valid`",
+      "detailsEn": "(#131009) Parameter value is not valid",
       "detailsZh": "提供的参数值不符合规格要求（例如手机号未包含国家区号、URL 不符合规范等）。",
-      "solutionEn": "`One or more parameter values are invalid.`",
+      "solutionEn": "One or more parameter values are invalid.",
       "solutionZh": "规范化手机号格式（去掉前导加号、空格或破折号，如 8613800000000）。",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Parameter Value Invalid\",\n    \"type\": \"OAuthException\",\n    \"code\": 131009,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`(#131009) Parameter value is not valid`\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Parameter Value Invalid\",\n    \"type\": \"OAuthException\",\n    \"code\": 131009,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"(#131009) Parameter value is not valid\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131016,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131016,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "Service Unavailable",
@@ -443,12 +579,18 @@
       "severity": "service_unavailable",
       "httpStatus": 503,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "WhatsApp Business Platform Status",
+          "url": "https://metastatus.com/whatsapp-business-api"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Service Unavailable\",\n    \"type\": \"OAuthException\",\n    \"code\": 131016,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"A service is temporarily unavailable.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131021,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131021,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "Sender and Recipient are the Same",
@@ -463,77 +605,107 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Sender and Recipient are the Same\",\n    \"type\": \"OAuthException\",\n    \"code\": 131021,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Sender and recipient phone number is the same.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131026,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131026,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "Message Undeliverable",
       "titleZh": "消息无法送达 (Message Undeliverable)",
-      "detailsEn": "Unable to deliver message. Reasons can include:&lt;br&gt;&lt;br&gt;* The recipient phone number is not a WhatsApp phone number.&lt;br&gt;* Recipient has not accepted the new Terms of Service and Privacy Policy.&lt;br&gt;* Recipient using an old WhatsApp version; must use the following WhatsApp version or greater:&lt;br&gt;  * Android: 2.21.15.15&lt;br&gt;  * SMBA: 2.21.15.15&lt;br&gt;  * iOS: 2.21.170.4&lt;br&gt;  * SMBI: 2.21.170.4&lt;br&gt;  * KaiOS: 2.2130.10&lt;br&gt;  * Web: 2.2132.6",
+      "detailsEn": "Unable to deliver message. Reasons can include:The recipient phone number is not a WhatsApp phone number.Recipient has not accepted the new Terms of Service and Privacy Policy.Recipient using an old WhatsApp version; must use the following WhatsApp version or greater:\n            Android: 2.21.15.15SMBA: 2.21.15.15iOS: 2.21.170.4SMBI: 2.21.170.4KaiOS: 2.2130.10Web: 2.2132.6",
       "detailsZh": "接收方手机号未注册 WhatsApp、对方版本过低、对方拉黑了该商家号码，或尚未同意最新的 WhatsApp 隐私条款。",
-      "solutionEn": "Using a non-WhatsApp communication method, ask the WhatsApp user to:&lt;br&gt;&lt;br&gt;* Confirm that they can actually send a message to your WhatsApp Business phone number.&lt;br&gt;* Confirm that they have accepted the latest Terms of Service (**Settings** &gt; **Help**, or **Settings** &gt; **Application information** will prompt them to accept the latest terms/policies if they haven't done so already)&lt;br&gt;* Update to the latest version of the WhatsApp client.",
+      "solutionEn": "Using a non-WhatsApp communication method, ask the WhatsApp user to:Confirm that they can actually send a message to your WhatsApp Business phone number.Confirm that they have accepted the latest Terms of Service (Settings > Help, or Settings > Application information will prompt them to accept the latest terms/policies if they haven’t done so already)Update to the latest version of the WhatsApp client.",
       "solutionZh": "确认接收方手机号确实开通了 WhatsApp；通过其他渠道让用户主动向您的商业号码发送一条消息以解除阻断。",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Message Undeliverable\",\n    \"type\": \"OAuthException\",\n    \"code\": 131026,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Unable to deliver message. Reasons can include:&lt;br&gt;&lt;br&gt;* The recipient phone number is n\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Message Undeliverable\",\n    \"type\": \"OAuthException\",\n    \"code\": 131026,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Unable to deliver message. Reasons can include:The recipient phone number is not a WhatsApp phone nu\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131031,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131031,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "Error 131031",
       "titleZh": "错误码 131031",
-      "detailsEn": "`The WhatsApp Business Account associated with the app has been restricted or disabled for violating a platform policy, or we were unable to verify data included in the request against data set on the WhatsApp Business Account (e.g, the two-step pin included in the request is incorrect).`",
+      "detailsEn": "The WhatsApp Business Account associated with the app has been restricted or disabled for violating a platform policy, or we were unable to verify data included in the request against data set on the WhatsApp Business Account (e.g, the two-step pin included in the request is incorrect).",
       "detailsZh": "`The WhatsApp Business Account associated with the app has been restricted or disabled for violating a platform policy, or we were unable to verify data included in the request against data set on the WhatsApp Business Account (e.g, the two-step pin included in the request is incorrect).`",
-      "solutionEn": "See the [Policy Enforcement](https://developers.facebook.com/documentation/business-messaging/whatsapp/policy-enforcement) document to learn about policy violations and how to resolve them.&lt;br&gt;&lt;br&gt;You can also use the [Health Status API](https://developers.facebook.com/documentation/business-messaging/whatsapp/support/health-status), which may provide additional insight into the reason or reasons for the account lock.",
-      "solutionZh": "See the [Policy Enforcement](https://developers.facebook.com/documentation/business-messaging/whatsapp/policy-enforcement) document to learn about policy violations and how to resolve them.&lt;br&gt;&lt;br&gt;You can also use the [Health Status API](https://developers.facebook.com/documentation/business-messaging/whatsapp/support/health-status), which may provide additional insight into the reason or reasons for the account lock.",
+      "solutionEn": "See the [Policy Enforcement](https://developers.facebook.com/documentation/business-messaging/whatsapp/policy-enforcement) document to learn about policy violations and how to resolve them.\n\nYou can also use the [Health Status API](https://developers.facebook.com/documentation/business-messaging/whatsapp/support/health-status), which may provide additional insight into the reason or reasons for the account lock.",
+      "solutionZh": "See the [Policy Enforcement](https://developers.facebook.com/documentation/business-messaging/whatsapp/policy-enforcement) document to learn about policy violations and how to resolve them.\n\nYou can also use the [Health Status API](https://developers.facebook.com/documentation/business-messaging/whatsapp/support/health-status), which may provide additional insight into the reason or reasons for the account lock.",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 131031\",\n    \"type\": \"OAuthException\",\n    \"code\": 131031,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`The WhatsApp Business Account associated with the app has been restricted or disabled for violating\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "relatedLinks": [
+        {
+          "title": "Policy Enforcement",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/policy-enforcement"
+        },
+        {
+          "title": "Health Status API",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/health-status"
+        }
+      ],
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 131031\",\n    \"type\": \"OAuthException\",\n    \"code\": 131031,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The WhatsApp Business Account associated with the app has been restricted or disabled for violating \"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131037,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131037,
       "category": "account",
       "categoryNameZh": "商业账号与封禁",
       "titleEn": "Business Phone Number Display Name Not Approved",
       "titleZh": "商业号码显示名称未通过审核",
       "detailsEn": "The [555 business phone number](https://developers.facebook.com/documentation/business-messaging/whatsapp/embedded-signup/overview#555-business-phone-numbers) used to send the request does not have an approved [display name](https://developers.facebook.com/documentation/business-messaging/whatsapp/display-names).",
       "detailsZh": "使用的商业号码 Display Name 处于审核中、被拒绝或尚未设置。",
-      "solutionEn": "Change the 555 business phone number's [display name](https://developers.facebook.com/documentation/business-messaging/whatsapp/display-names). Also see our [How to change your WhatsApp Business display name](https://www.facebook.com/business/help/378834799515077) Help Center article.",
+      "solutionEn": "Change the 555 business phone number’s [display name](https://developers.facebook.com/documentation/business-messaging/whatsapp/display-names). Also see our [How to change your WhatsApp Business display name](https://www.facebook.com/business/help/378834799515077) Help Center article.",
       "solutionZh": "登录 WhatsApp Manager 前往电话号码设置，重新提交符合命名准则的显示名称等待审核。",
       "severity": "blocker",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "555 business phone number",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/embedded-signup/overview#555-business-phone-numbers"
+        },
+        {
+          "title": "display name",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/display-names"
+        },
+        {
+          "title": "How to change your WhatsApp Business display name",
+          "url": "https://www.facebook.com/business/help/378834799515077"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Business Phone Number Display Name Not Approved\",\n    \"type\": \"OAuthException\",\n    \"code\": 131037,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The [555 business phone number](https://developers.facebook.com/documentation/business-messaging/wha\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131042,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131042,
       "category": "account",
       "categoryNameZh": "商业账号与封禁",
       "titleEn": "Payment Method Error",
       "titleZh": "支付方式异常或账单超限",
       "detailsEn": "There was an error related to your payment method.",
       "detailsZh": "绑定的信用卡扣费失败、信用额度超标、未设置币种/时区，或 WABA 未关联有效的支付账户。",
-      "solutionEn": "See [About Billing For Your WhatsApp Business account](https://www.facebook.com/business/help/2225184664363779) and verify that you have set up billing correctly.&lt;br&gt;&lt;br&gt;Common problems:&lt;br&gt;&lt;br&gt;- Payment account is not attached to a WhatsApp Business account&lt;br&gt;- Credit line is over the limit&lt;br&gt;- Credit line (Payment Account) not set or active&lt;br&gt;- WhatsApp Business account is deleted&lt;br&gt;- WhatsApp Business account is suspended&lt;br&gt;- Timezone not set&lt;br&gt;- Currency not set&lt;br&gt;- MessagingFor request (On Behalf Of) is pending or declined",
+      "solutionEn": "See [About Billing For Your WhatsApp Business account](https://www.facebook.com/business/help/2225184664363779) and verify that you have set up billing correctly.Common problems:Payment account is not attached to a WhatsApp Business accountCredit line is over the limitCredit line (Payment Account) not set or activeWhatsApp Business account is deletedWhatsApp Business account is suspendedTimezone not setCurrency not setMessagingFor request (On Behalf Of) is pending or declined",
       "solutionZh": "进入 Meta 商务管理平台的“账单与支付”页面更新信用卡，并确保 WABA 已正确关联支付账户。",
       "severity": "blocker",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "About Billing For Your WhatsApp Business account",
+          "url": "https://www.facebook.com/business/help/2225184664363779"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Payment Method Error\",\n    \"type\": \"OAuthException\",\n    \"code\": 131042,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"There was an error related to your payment method.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131045,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131045,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Phone Number Registration Error",
@@ -545,12 +717,18 @@
       "severity": "blocker",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Register the phone number",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/registration"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Phone Number Registration Error\",\n    \"type\": \"OAuthException\",\n    \"code\": 131045,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Message failed to send due to a phone number registration error.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131047,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131047,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "24-Hour Customer Service Window Expired",
@@ -562,12 +740,18 @@
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "template message",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/overview"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"24-Hour Customer Service Window Expired\",\n    \"type\": \"OAuthException\",\n    \"code\": 131047,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"More than 24 hours have passed since the recipient last replied to the sender number.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131048,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131048,
       "category": "rate_limit",
       "categoryNameZh": "频率与流控限制",
       "titleEn": "Spam Rate Limit Hit",
@@ -579,29 +763,45 @@
       "severity": "rate_limit",
       "httpStatus": 429,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Template limits",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/overview#template-limits"
+        },
+        {
+          "title": "Template quality",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/template-quality"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Spam Rate Limit Hit\",\n    \"type\": \"OAuthException\",\n    \"code\": 131048,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Message failed to send because there are restrictions on how many messages can be sent from this pho\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131049,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131049,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "Per-User Marketing Template Message Limit Reached",
       "titleZh": "达到单用户营销模板消息推送上限",
       "detailsEn": "This message was not delivered to maintain healthy ecosystem engagement.",
       "detailsZh": "为保护生态体验，Meta 限制了向单个 WhatsApp 用户连续推送营销模板的频次。",
-      "solutionEn": "If you do receive this error code and suspect it is due to the limit, wait at least 24 hours before resending the template message. Doing so will only result in another error response since the limit may be in effect for differing periods of time.&lt;br&gt;&lt;br&gt;See [Per-User Marketing Template Message Limits](https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/marketing-templates/per-user-limits) for additional information.",
+      "solutionEn": "If you do receive this error code and suspect it is due to the limit, wait at least 24 hours before resending the template message. Doing so will only result in another error response since the limit may be in effect for differing periods of time.See [Per-User Marketing Template Message Limits](https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/marketing-templates/per-user-limits) for additional information.",
       "solutionZh": "请至少等待 24 小时后再向该用户重试发送营销模板，或改用实用通知型（Utility）模板。",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Per-User Marketing Template Message Limits",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/marketing-templates/per-user-limits"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Per-User Marketing Template Message Limit Reached\",\n    \"type\": \"OAuthException\",\n    \"code\": 131049,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"This message was not delivered to maintain healthy ecosystem engagement.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131050,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131050,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "User Opted Out of Marketing Messages",
@@ -613,12 +813,18 @@
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "user_preferences webhook",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/webhooks/reference/user_preferences"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"User Opted Out of Marketing Messages\",\n    \"type\": \"OAuthException\",\n    \"code\": 131050,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Unable to deliver the message. This recipient has chosen to stop receiving marketing messages on Wha\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131051,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131051,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "Unsupported Message Type",
@@ -630,19 +836,25 @@
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Messages",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/messages/send-messages#message-types"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Unsupported Message Type\",\n    \"type\": \"OAuthException\",\n    \"code\": 131051,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Unsupported message type.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131052,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131052,
       "category": "media",
       "categoryNameZh": "多媒体上传与下载",
       "titleEn": "Media Download Error",
       "titleZh": "用户媒体下载失败",
       "detailsEn": "Unable to download the media sent by the user.",
       "detailsZh": "用户发送的图片或视频无法从 WhatsApp 服务器获取，可能已过期或文件损坏。",
-      "solutionEn": "The media included in the WhatsApp user's message could not be downloaded. For more information, refer to the `error.error_data.details` value in any **messages** webhooks triggered when this message was received.&lt;br&gt;&lt;br&gt;Ask the WhatsApp user to send you the media file using a non-WhatsApp method.",
+      "solutionEn": "The media included in the WhatsApp user’s message could not be downloaded. For more information, refer to the error.error_data.details value in any messages webhooks triggered when this message was received.Ask the WhatsApp user to send you the media file using a non-WhatsApp method.",
       "solutionZh": "从 messages Webhook 中检查 error_data.details，必要时请用户重新发送。",
       "severity": "client_error",
       "httpStatus": 400,
@@ -650,43 +862,49 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Media Download Error\",\n    \"type\": \"OAuthException\",\n    \"code\": 131052,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Unable to download the media sent by the user.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131053,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131053,
       "category": "media",
       "categoryNameZh": "多媒体上传与下载",
       "titleEn": "Media Upload Error",
       "titleZh": "媒体文件上传或格式不符",
       "detailsEn": "Unable to upload the media used in the message.",
       "detailsZh": "上传的媒体文件超过大小限制（图片>5MB，视频/音频>16MB，文档>100MB），或者格式/编码不合规。",
-      "solutionEn": "The media could not be uploaded for one or more reasons, such as an unsupported media type.&lt;br&gt;&lt;br&gt;For more information, refer to the `error.error_data.details` value in any **messages** webhooks triggered when this message fails to send.&lt;br&gt;&lt;br&gt;Inspect any media files that are causing errors and confirm that they are in fact supported. For example, in UNIX you can use file inspection via the command line to determine its MIME type:&lt;br&gt;&lt;br&gt;`file -I rejected-file.mov`&lt;br&gt;&lt;br&gt;You can then confirm if its MIME type is supported. See [Supported Media Types](https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/media#supported-media-types).",
+      "solutionEn": "The media could not be uploaded for one or more reasons, such as an unsupported media type.For more information, refer to the error.error_data.details value in any messages webhooks triggered when this message fails to send.Inspect any media files that are causing errors and confirm that they are in fact supported. For example, in UNIX you can use file inspection via the command line to determine its MIME type:file -I rejected-file.movYou can then confirm if its MIME type is supported. See [Supported Media Types](https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/media#supported-media-types).",
       "solutionZh": "使用本工具的“媒体文件工具”进行检测与转码：图片压至 5MB，视频转 H.264/AAC，贴纸转 512x512 WebP。",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Supported Media Types",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/media#supported-media-types"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Media Upload Error\",\n    \"type\": \"OAuthException\",\n    \"code\": 131053,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Unable to upload the media used in the message.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131055,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131055,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "Error 131055",
       "titleZh": "错误码 131055",
-      "detailsEn": "`(#131055) Method not allowed`",
+      "detailsEn": "(#131055) Method not allowed",
       "detailsZh": "`(#131055) Method not allowed`",
-      "solutionEn": "`Only marketing template messages are supported`",
+      "solutionEn": "Only marketing template messages are supported",
       "solutionZh": "`Only marketing template messages are supported`",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 131055\",\n    \"type\": \"OAuthException\",\n    \"code\": 131055,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`(#131055) Method not allowed`\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 131055\",\n    \"type\": \"OAuthException\",\n    \"code\": 131055,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"(#131055) Method not allowed\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131056,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131056,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "Error 131056",
@@ -701,9 +919,9 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 131056\",\n    \"type\": \"OAuthException\",\n    \"code\": 131056,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Too many messages sent from the sender phone number to the same recipient phone number in a short pe\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131057,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131057,
       "category": "account",
       "categoryNameZh": "商业账号与封禁",
       "titleEn": "Business Account in Maintenance Mode",
@@ -715,29 +933,45 @@
       "severity": "service_unavailable",
       "httpStatus": 503,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "throughput",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/throughput"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Business Account in Maintenance Mode\",\n    \"type\": \"OAuthException\",\n    \"code\": 131057,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Business Account is in maintenance mode\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131063,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131063,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Marketing Templates Disabled on Cloud API",
       "titleZh": "当前配置禁用了 Cloud API 营销模板",
       "detailsEn": "Your template is categorized as Marketing, but marketing templates are currently disabled for your Cloud API configuration.",
       "detailsZh": "商业账号开启了 disable_marketing_messages_on_cloud_api 配置。",
-      "solutionEn": "The business has set `disable_marketing_messages_on_cloud_api` to `true` on their Messaging account. To send this template, use the [Marketing Messages API](https://developers.facebook.com/documentation/business-messaging/whatsapp/marketing-messages/send-marketing-messages), or [re-enable marketing templates on Cloud API](https://developers.facebook.com/documentation/business-messaging/whatsapp/marketing-messages/send-marketing-messages#re-enable-marketing-messages-on-cloud-api) by setting `disable_marketing_messages_on_cloud_api` to `false`.",
+      "solutionEn": "The business has set disable_marketing_messages_on_cloud_api to true on their Messaging account. To send this template, use the [Marketing Messages API](https://developers.facebook.com/documentation/business-messaging/whatsapp/marketing-messages/send-marketing-messages), or [re-enable marketing templates on Cloud API](https://developers.facebook.com/documentation/business-messaging/whatsapp/marketing-messages/send-marketing-messages#re-enable-marketing-messages-on-cloud-api) by setting disable_marketing_messages_on_cloud_api to false.",
       "solutionZh": "在 Messaging 账号设置中将 disable_marketing_messages_on_cloud_api 改为 false。",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Marketing Messages API",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/marketing-messages/send-marketing-messages"
+        },
+        {
+          "title": "re-enable marketing templates on Cloud API",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/marketing-messages/send-marketing-messages#re-enable-marketing-messages-on-cloud-api"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Marketing Templates Disabled on Cloud API\",\n    \"type\": \"OAuthException\",\n    \"code\": 131063,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Your template is categorized as Marketing, but marketing templates are currently disabled for your C\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 131064,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 131064,
       "category": "messaging",
       "categoryNameZh": "消息发送与接收",
       "titleEn": "Restricted Messaging Tier",
@@ -749,12 +983,18 @@
       "severity": "blocker",
       "httpStatus": 403,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Template quality",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/template-quality"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Restricted Messaging Tier\",\n    \"type\": \"OAuthException\",\n    \"code\": 131064,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Message failed to send because this account has reached its messaging limit due to template classifi\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 132000,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 132000,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Template Parameter Count Mismatch",
@@ -766,12 +1006,18 @@
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Templates",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/overview#parameter-formats"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Template Parameter Count Mismatch\",\n    \"type\": \"OAuthException\",\n    \"code\": 132000,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The number of variable parameter values included in the request did not match the number of variable\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 132001,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 132001,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Template Does Not Exist or Not Approved",
@@ -783,12 +1029,18 @@
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Templates",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/overview"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Template Does Not Exist or Not Approved\",\n    \"type\": \"OAuthException\",\n    \"code\": 132001,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The template does not exist in the specified language or the template has not been approved.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 132005,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 132005,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Translated Text Too Long",
@@ -800,12 +1052,18 @@
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Template quality",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/template-quality"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Translated Text Too Long\",\n    \"type\": \"OAuthException\",\n    \"code\": 132005,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Translated text is too long.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 132007,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 132007,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Template Violates WhatsApp Policy",
@@ -817,12 +1075,18 @@
       "severity": "blocker",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Template review",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/template-review"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Template Violates WhatsApp Policy\",\n    \"type\": \"OAuthException\",\n    \"code\": 132007,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Template content violates a WhatsApp policy.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 132012,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 132012,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Template Parameter Format Invalid",
@@ -834,12 +1098,18 @@
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Templates",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/overview#parameter-formats"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Template Parameter Format Invalid\",\n    \"type\": \"OAuthException\",\n    \"code\": 132012,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Variable parameter values formatted incorrectly.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 132015,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 132015,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Template Paused Due to Low Quality",
@@ -851,12 +1121,22 @@
       "severity": "blocker",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "low quality",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/template-quality"
+        },
+        {
+          "title": "Edit the template",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/template-management#edit-templates"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Template Paused Due to Low Quality\",\n    \"type\": \"OAuthException\",\n    \"code\": 132015,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Template is paused due to [low quality](https://developers.facebook.com/documentation/business-messa\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 132016,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 132016,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Template Permanently Disabled",
@@ -868,29 +1148,35 @@
       "severity": "blocker",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "low quality",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/template-quality"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Template Permanently Disabled\",\n    \"type\": \"OAuthException\",\n    \"code\": 132016,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Template has been paused too many times due to [low quality](https://developers.facebook.com/documen\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 132018,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 132018,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Error 132018",
       "titleZh": "错误码 132018",
-      "detailsEn": "`(#132018) Template validation error`",
+      "detailsEn": "(#132018) Template validation error",
       "detailsZh": "`(#132018) Template validation error`",
-      "solutionEn": "`There's an issue with the parameters in your template.`",
+      "solutionEn": "There's an issue with the parameters in your template.",
       "solutionZh": "`There's an issue with the parameters in your template.`",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 132018\",\n    \"type\": \"OAuthException\",\n    \"code\": 132018,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`(#132018) Template validation error`\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 132018\",\n    \"type\": \"OAuthException\",\n    \"code\": 132018,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"(#132018) Template validation error\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 132068,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 132068,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Flow is in Blocked State",
@@ -905,9 +1191,9 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Flow is in Blocked State\",\n    \"type\": \"OAuthException\",\n    \"code\": 132068,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Flow is in blocked state.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 132069,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 132069,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Flow is in Throttled State",
@@ -922,9 +1208,9 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Flow is in Throttled State\",\n    \"type\": \"OAuthException\",\n    \"code\": 132069,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Flow is in throttled state and 10 messages using this flow were already sent in the last hour.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 133000,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 133000,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Deregistration Failed",
@@ -936,46 +1222,68 @@
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Deregister",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/registration#deregister-phone"
+        },
+        {
+          "title": "registering",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/registration"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Deregistration Failed\",\n    \"type\": \"OAuthException\",\n    \"code\": 133000,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"A previous deregistration attempt failed.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 133004,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 133004,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Server Temporary Error During Registration",
       "titleZh": "号码注册时服务器暂时性错误",
       "detailsEn": "Server is temporarily unavailable.",
       "detailsZh": "在请求两步验证短信/语音或提交 PIN 码时发生网络或服务震荡。",
-      "solutionEn": "Check the [WhatsApp Business Platform Status](https://metastatus.com/whatsapp-business-api) page to see API status information and check the response `details` value before trying again.",
+      "solutionEn": "Check the [WhatsApp Business Platform Status](https://metastatus.com/whatsapp-business-api) page to see API status information and check the response details value before trying again.",
       "solutionZh": "等待 5 分钟后再次请求验证码。",
       "severity": "service_unavailable",
       "httpStatus": 500,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "WhatsApp Business Platform Status",
+          "url": "https://metastatus.com/whatsapp-business-api"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Server Temporary Error During Registration\",\n    \"type\": \"OAuthException\",\n    \"code\": 133004,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Server is temporarily unavailable.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 133005,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 133005,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Two-Step Verification PIN Mismatch",
       "titleZh": "两步验证 PIN 码不正确",
       "detailsEn": "Two-step verification PIN incorrect.",
       "detailsZh": "在注册端点提交的 6 位数字 PIN 码与之前设置的 PIN 不匹配。",
-      "solutionEn": "Verify that the two-step verification PIN included in the request is correct.&lt;br&gt;&lt;br&gt;To reset the PIN, disable two-step verification, then set a new PIN. See [Two-step verification](https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/phone-numbers#two-step-verification).",
+      "solutionEn": "Verify that the two-step verification PIN included in the request is correct.To reset the PIN, disable two-step verification, then set a new PIN. See [Two-step verification](https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/phone-numbers#two-step-verification).",
       "solutionZh": "输入正确的 6 位 PIN 码；如遗忘，请在 WhatsApp Manager 申请重置两步验证 PIN 码。",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Two-step verification",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/phone-numbers#two-step-verification"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Two-Step Verification PIN Mismatch\",\n    \"type\": \"OAuthException\",\n    \"code\": 133005,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Two-step verification PIN incorrect.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 133006,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 133006,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Phone Number Re-verification Required",
@@ -987,19 +1295,25 @@
       "severity": "blocker",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Verify and register the phone number",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/solution-providers/registering-phone-numbers"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Phone Number Re-verification Required\",\n    \"type\": \"OAuthException\",\n    \"code\": 133006,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Phone number needs to be verified before registering.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 133008,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 133008,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Error 133008",
       "titleZh": "错误码 133008",
       "detailsEn": "Too many two-step verification PIN guesses for this phone number.",
       "detailsZh": "Too many two-step verification PIN guesses for this phone number.",
-      "solutionEn": "Try again after the amount of time specified in the `details` response value.",
+      "solutionEn": "Try again after the amount of time specified in the details response value.",
       "solutionZh": "Try again after the amount of time specified in the `details` response value.",
       "severity": "client_error",
       "httpStatus": 400,
@@ -1007,16 +1321,16 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 133008\",\n    \"type\": \"OAuthException\",\n    \"code\": 133008,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Too many two-step verification PIN guesses for this phone number.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 133009,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 133009,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Error 133009",
       "titleZh": "错误码 133009",
       "detailsEn": "Two-step verification PIN was entered too quickly.",
       "detailsZh": "Two-step verification PIN was entered too quickly.",
-      "solutionEn": "Check the `details` response value before trying again.",
+      "solutionEn": "Check the details response value before trying again.",
       "solutionZh": "Check the `details` response value before trying again.",
       "severity": "client_error",
       "httpStatus": 400,
@@ -1024,9 +1338,9 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 133009\",\n    \"type\": \"OAuthException\",\n    \"code\": 133009,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Two-step verification PIN was entered too quickly.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 133010,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 133010,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Phone Number Already Registered",
@@ -1038,12 +1352,18 @@
       "severity": "blocker",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Register the phone number",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/registration"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Phone Number Already Registered\",\n    \"type\": \"OAuthException\",\n    \"code\": 133010,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Phone number not registered on the WhatsApp Business Platform.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 133015,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 133015,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Certificate Invalid or Expired",
@@ -1058,111 +1378,127 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Certificate Invalid or Expired\",\n    \"type\": \"OAuthException\",\n    \"code\": 133015,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The phone number you are attempting to register was recently deleted, and deletion has not yet compl\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 133016,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 133016,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Certificate Revoked",
       "titleZh": "号码证书已被吊销",
-      "detailsEn": "`Registration or Deregistration failed because there were too many attempts for this phone number in a short period of time`",
+      "detailsEn": "Registration or Deregistration failed because there were too many attempts for this phone number in a short period of time",
       "detailsZh": "证书由于安全或违规原因被 Meta 系统撤销。",
-      "solutionEn": "The business phone number is being blocked because it has reached its registration/deregistration attempt limit. Try again once the number is unblocked. See \"Limitations\" in the [Registration](https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/registration) document.",
+      "solutionEn": "The business phone number is being blocked because it has reached its registration/deregistration attempt limit. Try again once the number is unblocked. See “Limitations” in the [Registration](https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/registration) document.",
       "solutionZh": "重新进行商业认证并申请新证书。",
       "severity": "blocker",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Certificate Revoked\",\n    \"type\": \"OAuthException\",\n    \"code\": 133016,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`Registration or Deregistration failed because there were too many attempts for this phone number in\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "relatedLinks": [
+        {
+          "title": "Registration",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/business-phone-numbers/registration"
+        }
+      ],
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Certificate Revoked\",\n    \"type\": \"OAuthException\",\n    \"code\": 133016,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Registration or Deregistration failed because there were too many attempts for this phone number in \"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 134011,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 134011,
       "category": "account",
       "categoryNameZh": "商业账号与封禁",
       "titleEn": "Payment Configuration Error",
       "titleZh": "支付配置或商业账单异常",
-      "detailsEn": "`Message failed to send because WhatsApp Payments terms of service acceptance is pending for this WhatsApp Business Account.`",
+      "detailsEn": "Message failed to send because WhatsApp Payments terms of service acceptance is pending for this WhatsApp Business Account.",
       "detailsZh": "商业账号未绑定有效信用卡/支付方式，或所绑定的付款账户已欠费停用。",
       "solutionEn": "Accept the WhatsApp Payments terms of service using the link provided in the error message before trying again.",
       "solutionZh": "在 Meta 商务管理平台的“支付方式”页面添加有效付款凭证，结算逾期账单后重试。",
       "severity": "blocker",
       "httpStatus": 402,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Payment Configuration Error\",\n    \"type\": \"OAuthException\",\n    \"code\": 134011,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`Message failed to send because WhatsApp Payments terms of service acceptance is pending for this Wh\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Payment Configuration Error\",\n    \"type\": \"OAuthException\",\n    \"code\": 134011,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Message failed to send because WhatsApp Payments terms of service acceptance is pending for this Wha\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 134100,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 134100,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Flow is in Blocked State",
       "titleZh": "WhatsApp Flow 处于阻断状态",
-      "detailsEn": "`(#134100) Only marketing messages supported`",
+      "detailsEn": "(#134100) Only marketing messages supported",
       "detailsZh": "消息模板引用的 WhatsApp Flow 交互式流程因安全审查不通过或被手动停用而无法加载。",
-      "solutionEn": "`You're only able to send marketing messages on this API.`",
+      "solutionEn": "You're only able to send marketing messages on this API.",
       "solutionZh": "在 WhatsApp Manager 中进入 Flows 界面，检查并重新发布 Flow 流程定义。",
       "severity": "blocker",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Flow is in Blocked State\",\n    \"type\": \"OAuthException\",\n    \"code\": 134100,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`(#134100) Only marketing messages supported`\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Flow is in Blocked State\",\n    \"type\": \"OAuthException\",\n    \"code\": 134100,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"(#134100) Only marketing messages supported\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 134101,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 134101,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Flow is in Throttled State",
       "titleZh": "WhatsApp Flow 触发频控限制",
-      "detailsEn": "`(#134101) Your template is still syncing`",
+      "detailsEn": "(#134101) Your template is still syncing",
       "detailsZh": "当前 Flow 数据终端（Data Endpoint）短时间内处理的互动请求超过阈值。",
-      "solutionEn": "`When you send a message from a template, the template syncing process can take up to 10 minutes to complete. Wait a few minutes, and then try sending your message again.`",
+      "solutionEn": "When you send a message from a template, the template syncing process can take up to 10 minutes to complete. Wait a few minutes, and then try sending your message again.",
       "solutionZh": "优化后端 Flow Endpoint 处理延迟与并发吞吐量，实施缓存策略以降低响应时间。",
       "severity": "rate_limit",
       "httpStatus": 429,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Flow is in Throttled State\",\n    \"type\": \"OAuthException\",\n    \"code\": 134101,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`(#134101) Your template is still syncing`\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Flow is in Throttled State\",\n    \"type\": \"OAuthException\",\n    \"code\": 134101,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"(#134101) Your template is still syncing\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 134102,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 134102,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Flow Endpoint Error",
       "titleZh": "WhatsApp Flow 终端服务异常",
-      "detailsEn": "`(#134102) Template unavailable for use`",
+      "detailsEn": "(#134102) Template unavailable for use",
       "detailsZh": "Meta 尝试调用开发者的 Flow 数据终端时发生网络超时、证书失效或返回了非 200 HTTP 响应。",
-      "solutionEn": "`Please check your eligibility status to ensure you are onboarded or contact Meta's customer support.`",
+      "solutionEn": "Please check your eligibility status to ensure you are onboarded or contact Meta's customer support.",
       "solutionZh": "检查 Flow 数据终端 URL 的公网可达性与 HTTPS 证书，核对解密与加密响应签名逻辑。",
       "severity": "service_unavailable",
       "httpStatus": 502,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Flow Endpoint Error\",\n    \"type\": \"OAuthException\",\n    \"code\": 134102,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`(#134102) Template unavailable for use`\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Flow Endpoint Error\",\n    \"type\": \"OAuthException\",\n    \"code\": 134102,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"(#134102) Template unavailable for use\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 135000,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 135000,
       "category": "account",
       "categoryNameZh": "商业账号与封禁",
       "titleEn": "Order / Payment Processing Timeout",
       "titleZh": "商业订单处理超时",
       "detailsEn": "Message failed to send because of an unknown error with your request parameters.",
       "detailsZh": "WhatsApp 商业支付交易在与支付服务提供商交互时发生超时中断。",
-      "solutionEn": "See the endpoint's [reference](https://developers.facebook.com/documentation/business-messaging/whatsapp/overview) to determine if you are querying the endpoint using the correct syntax.  Contact [customer support](https://developers.facebook.com/support/) if you continue receiving this error code in response.",
+      "solutionEn": "See the endpoint’s [reference](https://developers.facebook.com/documentation/business-messaging/whatsapp/overview) to determine if you are querying the endpoint using the correct syntax.  Contact [customer support](https://developers.facebook.com/support/) if you continue receiving this error code in response.",
       "solutionZh": "检查关联的支付网关（如 Razorpay、PayU 等）运行状况，使用订单查询接口核对交易状态。",
       "severity": "service_unavailable",
       "httpStatus": 504,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "reference",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/overview"
+        },
+        {
+          "title": "customer support",
+          "url": "https://developers.facebook.com/support/"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Order / Payment Processing Timeout\",\n    \"type\": \"OAuthException\",\n    \"code\": 135000,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Message failed to send because of an unknown error with your request parameters.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 139000,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 139000,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Blocked by Integrity",
@@ -1177,9 +1513,9 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Blocked by Integrity\",\n    \"type\": \"OAuthException\",\n    \"code\": 139000,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Blocked by Integrity\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 200000,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 200000,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Cannot Add Phone Number to WABA",
@@ -1194,9 +1530,9 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Cannot Add Phone Number to WABA\",\n    \"type\": \"OAuthException\",\n    \"code\": 200000,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Cannot add phone number to WhatsApp Business Account\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 200002,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 200002,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "HSM Template Creation Failed",
@@ -1211,26 +1547,66 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"HSM Template Creation Failed\",\n    \"type\": \"OAuthException\",\n    \"code\": 200002,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"HSM Template creation failed\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 200005,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 200005,
       "category": "template",
       "categoryNameZh": "消息模板",
       "titleEn": "Template Insights Not Available",
       "titleZh": "模板送达与转化分析数据尚未就绪",
-      "detailsEn": "Template Insights are not available yet for this WhatsApp Business account",
+      "detailsEn": "Template insights are not available yet for this Messaging account.",
       "detailsZh": "请求读取该商业账号的模板统计分析（Template Insights）时，该模板发送量不足或 Meta 统计流水线尚未汇总完成。",
-      "solutionEn": "Refer to WhatsApp Graph API Reference (root).",
+      "solutionEn": "You are unable to enable template insights for this Messaging account at the moment.",
       "solutionZh": "模板数据分析通常需要积累一定的发送量（通常至少 100+ 条）并在次日生成报表，请等待 Meta 离线流水线产出数据后再行查询。",
       "severity": "client_error",
       "httpStatus": 400,
-      "docUrl": "https://developers.facebook.com/docs/graph-api/reference/whats-app-business-account/",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Template Insights Not Available\",\n    \"type\": \"OAuthException\",\n    \"code\": 200005,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Template Insights are not available yet for this WhatsApp Business account\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Template Insights Not Available\",\n    \"type\": \"OAuthException\",\n    \"code\": 200005,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Template insights are not available yet for this Messaging account.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 200006,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 200006",
+      "titleZh": "错误码 200006",
+      "detailsEn": "Invalid operation. Template Insights cannot be disabled once enabled.",
+      "detailsZh": "Invalid operation. Template Insights cannot be disabled once enabled.",
+      "solutionEn": "Template insights cannot be disabled once enabled for a Messaging account.",
+      "solutionZh": "Template insights cannot be disabled once enabled for a Messaging account.",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 200006\",\n    \"type\": \"OAuthException\",\n    \"code\": 200006,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Invalid operation. Template Insights cannot be disabled once enabled.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
+      "code": 200007,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 200007",
+      "titleZh": "错误码 200007",
+      "detailsEn": "Template Insights have not been enabled for this WhatsApp Business Account",
+      "detailsZh": "Template Insights have not been enabled for this WhatsApp Business Account",
+      "solutionEn": "To enable template insights, see [Confirming template analytics](https://developers.facebook.com/documentation/business-messaging/whatsapp/analytics#confirming-template-analytics).",
+      "solutionZh": "To enable template insights, see [Confirming template analytics](https://developers.facebook.com/documentation/business-messaging/whatsapp/analytics#confirming-template-analytics).",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Confirming template analytics",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/analytics#confirming-template-analytics"
+        }
+      ],
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 200007\",\n    \"type\": \"OAuthException\",\n    \"code\": 200007,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Template Insights have not been enabled for this WhatsApp Business Account\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
       "code": 200008,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
       "category": "account",
       "categoryNameZh": "商业账号与封禁",
       "titleEn": "WABA Has No Linked Phone Numbers",
@@ -1245,26 +1621,242 @@
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"WABA Has No Linked Phone Numbers\",\n    \"type\": \"OAuthException\",\n    \"code\": 200008,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"WhatsApp Business Account has no linked phone numbers.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 1752041,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 1752041,
       "category": "account",
       "categoryNameZh": "商业账号与封禁",
       "titleEn": "Product Not Found in Catalog",
       "titleZh": "商品目录中未找到对应商品",
-      "detailsEn": "`(#1752041) Duplicate Request`",
+      "detailsEn": "(#1752041) Duplicate Request",
       "detailsZh": "交互式产品消息（Single/Multi-Product Message）中指定的 retailer_id 在关联的商品目录中不存在或已下架。",
-      "solutionEn": "`Duplicate Request is thrown when a client has already been invited to onboard by any partner.`",
+      "solutionEn": "Duplicate Request is thrown when a client has already been invited to onboard by any partner.",
       "solutionZh": "在 Meta Commerce Manager 中确认商品目录已与 WABA 成功绑定，检查 retailer_id 是否有效且商品处于审核通过（Approved）状态。",
       "severity": "client_error",
       "httpStatus": 404,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Product Not Found in Catalog\",\n    \"type\": \"OAuthException\",\n    \"code\": 1752041,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`(#1752041) Duplicate Request`\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Product Not Found in Catalog\",\n    \"type\": \"OAuthException\",\n    \"code\": 1752041,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"(#1752041) Duplicate Request\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 2388012,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 2388012",
+      "titleZh": "错误码 2388012",
+      "detailsEn": "The phone number you are trying to migrate is already present in your WhatsApp account.",
+      "detailsZh": "The phone number you are trying to migrate is already present in your WhatsApp account.",
+      "solutionEn": "Try again with a phone number that is not already present in your WhatsApp account.",
+      "solutionZh": "Try again with a phone number that is not already present in your WhatsApp account.",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 2388012\",\n    \"type\": \"OAuthException\",\n    \"code\": 2388012,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The phone number you are trying to migrate is already present in your WhatsApp account.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
+      "code": 2388019,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 2388019",
+      "titleZh": "错误码 2388019",
+      "detailsEn": "You have exceeded the maximum number of message templates you can have for this WhatsApp business account.",
+      "detailsZh": "You have exceeded the maximum number of message templates you can have for this WhatsApp business account.",
+      "solutionEn": "A Messaging account can have up to 250 message templates. See [Template limits](https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/overview#template-limits).",
+      "solutionZh": "A Messaging account can have up to 250 message templates. See [Template limits](https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/overview#template-limits).",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Template limits",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/overview#template-limits"
+        }
+      ],
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 2388019\",\n    \"type\": \"OAuthException\",\n    \"code\": 2388019,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"You have exceeded the maximum number of message templates you can have for this WhatsApp business ac\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
+      "code": 2388039,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 2388039",
+      "titleZh": "错误码 2388039",
+      "detailsEn": "The status for this message template can’t be changed. You can only delete or add templates.",
+      "detailsZh": "The status for this message template can’t be changed. You can only delete or add templates.",
+      "solutionEn": "This occurs when you try to edit a template whose status cannot be changed, for example, a template that is still in review. Wait until the template is approved or rejected before editing, and note that templates have a daily limit on the number of edits.",
+      "solutionZh": "This occurs when you try to edit a template whose status cannot be changed, for example, a template that is still in review. Wait until the template is approved or rejected before editing, and note that templates have a daily limit on the number of edits.",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 2388039\",\n    \"type\": \"OAuthException\",\n    \"code\": 2388039,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The status for this message template can’t be changed. You can only delete or add templates.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
+      "code": 2388040,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 2388040",
+      "titleZh": "错误码 2388040",
+      "detailsEn": "A field in your template has exceeded the maximum character limit allowed.",
+      "detailsZh": "A field in your template has exceeded the maximum character limit allowed.",
+      "solutionEn": "Refer to the error message for specific details on the affected field and its corresponding character limits.",
+      "solutionZh": "Refer to the error message for specific details on the affected field and its corresponding character limits.",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 2388040\",\n    \"type\": \"OAuthException\",\n    \"code\": 2388040,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"A field in your template has exceeded the maximum character limit allowed.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
+      "code": 2388047,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 2388047",
+      "titleZh": "错误码 2388047",
+      "detailsEn": "Your message header contains invalid formatting.",
+      "detailsZh": "Your message header contains invalid formatting.",
+      "solutionEn": "Refer to the error message for specific details on valid formatting.",
+      "solutionZh": "Refer to the error message for specific details on valid formatting.",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 2388047\",\n    \"type\": \"OAuthException\",\n    \"code\": 2388047,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Your message header contains invalid formatting.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
+      "code": 2388072,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 2388072",
+      "titleZh": "错误码 2388072",
+      "detailsEn": "Your message body contains invalid formatting.",
+      "detailsZh": "Your message body contains invalid formatting.",
+      "solutionEn": "Refer to the error message for specific details on valid formatting.",
+      "solutionZh": "Refer to the error message for specific details on valid formatting.",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 2388072\",\n    \"type\": \"OAuthException\",\n    \"code\": 2388072,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Your message body contains invalid formatting.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
+      "code": 2388073,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 2388073",
+      "titleZh": "错误码 2388073",
+      "detailsEn": "Your message footer contains invalid formatting.",
+      "detailsZh": "Your message footer contains invalid formatting.",
+      "solutionEn": "Refer to the error message for specific details on valid formatting.",
+      "solutionZh": "Refer to the error message for specific details on valid formatting.",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 2388073\",\n    \"type\": \"OAuthException\",\n    \"code\": 2388073,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Your message footer contains invalid formatting.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
+      "code": 2388091,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 2388091",
+      "titleZh": "错误码 2388091",
+      "detailsEn": "Phone ownership verification APIs are not available for this use case.",
+      "detailsZh": "Phone ownership verification APIs are not available for this use case.",
+      "solutionEn": "[Register and verify the number](https://developers.facebook.com/documentation/business-messaging/whatsapp/solution-providers/registering-phone-numbers).",
+      "solutionZh": "[Register and verify the number](https://developers.facebook.com/documentation/business-messaging/whatsapp/solution-providers/registering-phone-numbers).",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Register and verify the number",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/solution-providers/registering-phone-numbers"
+        }
+      ],
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 2388091\",\n    \"type\": \"OAuthException\",\n    \"code\": 2388091,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Phone ownership verification APIs are not available for this use case.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
+      "code": 2388103,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 2388103",
+      "titleZh": "错误码 2388103",
+      "detailsEn": "Not applicable. Phone number migration isn’t supported for accounts on the new WhatsApp account model.",
+      "detailsZh": "Not applicable. Phone number migration isn’t supported for accounts on the new WhatsApp account model.",
+      "solutionEn": "Not applicable.",
+      "solutionZh": "Not applicable.",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 2388103\",\n    \"type\": \"OAuthException\",\n    \"code\": 2388103,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Not applicable. Phone number migration isn’t supported for accounts on the new WhatsApp account mode\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
+      "code": 2388293,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 2388293",
+      "titleZh": "错误码 2388293",
+      "detailsEn": "This template has too many variables for its length. Reduce the number of variables or increase the message length.",
+      "detailsZh": "This template has too many variables for its length. Reduce the number of variables or increase the message length.",
+      "solutionEn": "Refer to the error message for specific details on valid formatting.",
+      "solutionZh": "Refer to the error message for specific details on valid formatting.",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 2388293\",\n    \"type\": \"OAuthException\",\n    \"code\": 2388293,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"This template has too many variables for its length. Reduce the number of variables or increase the \"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
+      "code": 2388299,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 2388299",
+      "titleZh": "错误码 2388299",
+      "detailsEn": "Variables cannot be at the start or end of the template.",
+      "detailsZh": "Variables cannot be at the start or end of the template.",
+      "solutionEn": "Refer to the error message for specific details on valid formatting.",
+      "solutionZh": "Refer to the error message for specific details on valid formatting.",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 2388299\",\n    \"type\": \"OAuthException\",\n    \"code\": 2388299,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Variables cannot be at the start or end of the template.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
+      "code": 2494100,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
+      "category": "general",
+      "categoryNameZh": "常规 Graph API 错误",
+      "titleEn": "Error 2494100",
+      "titleZh": "错误码 2494100",
+      "detailsEn": "The business phone number is in maintenance mode.",
+      "detailsZh": "The business phone number is in maintenance mode.",
+      "solutionEn": "Try again in a few minutes.",
+      "solutionZh": "Try again in a few minutes.",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 2494100\",\n    \"type\": \"OAuthException\",\n    \"code\": 2494100,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"The business phone number is in maintenance mode.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
       "code": 2593079,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Certificate Verification Failed",
@@ -1276,40 +1868,58 @@
       "severity": "blocker",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "deprecated",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/solution-providers/obo-model-deprecation"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Certificate Verification Failed\",\n    \"type\": \"OAuthException\",\n    \"code\": 2593079,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"This WABA has already been marked for migration to a different solution ID\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 2593107,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 2593107,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Migration Token Invalid",
       "titleZh": "On-Premises 迁移凭证无效",
-      "detailsEn": "`You have exceeded the maximum number of times to call the synchronization api for this phone number.`",
+      "detailsEn": "You have exceeded the maximum number of times to call the synchronization api for this phone number.",
       "detailsZh": "从自建 On-Premises API 迁移至 Cloud API 时所提供的备份迁移令牌已过期或权限不足。",
-      "solutionEn": "You can only call this endpoint once to synchronize the business phone number contacts and once to synchronize its messaging history. See [Onboarding business app users](https://developers.facebook.com/documentation/business-messaging/whatsapp/embedded-signup/onboarding-business-app-users#synchronizing-whatsapp-business-app-data).&lt;br&gt;&lt;br&gt;Offboard the business customer and re-onboard them.",
+      "solutionEn": "You can only call this endpoint once to synchronize the business phone number contacts and once to synchronize its messaging history. See [Onboarding business app users](https://developers.facebook.com/documentation/business-messaging/whatsapp/embedded-signup/onboarding-business-app-users#synchronizing-whatsapp-business-app-data).Offboard the business customer and re-onboard them.",
       "solutionZh": "在源 On-Premises 实例重新调用 /v1/configs/backup 获取最新的迁移凭证，并在 24 小时内完成云端导入。",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
-      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Migration Token Invalid\",\n    \"type\": \"OAuthException\",\n    \"code\": 2593107,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"`You have exceeded the maximum number of times to call the synchronization api for this phone number\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+      "relatedLinks": [
+        {
+          "title": "Onboarding business app users",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/embedded-signup/onboarding-business-app-users#synchronizing-whatsapp-business-app-data"
+        }
+      ],
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Migration Token Invalid\",\n    \"type\": \"OAuthException\",\n    \"code\": 2593107,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"You have exceeded the maximum number of times to call the synchronization api for this phone number.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
+      "code": 2593108,
       "provider": "meta",
       "providerNameZh": "Meta WhatsApp 官方",
-      "code": 2593108,
       "category": "registration",
       "categoryNameZh": "号码注册与验证",
       "titleEn": "Cloud API Onboarding Mismatch",
       "titleZh": "Cloud API 接入模式冲突",
       "detailsEn": "Synchronization request can only be made within 24 hours of onboarding",
       "detailsZh": "号码当前已作为 On-Premises 或其他 Cloud API 商业实体运行，无法直接执行初始化注册。",
-      "solutionEn": "You can only initiate contacts and messaging history synchronization of an onboarded WhatsApp Business app user within 24 hours of onboarding the user. See [Onboarding business app users](https://developers.facebook.com/documentation/business-messaging/whatsapp/embedded-signup/onboarding-business-app-users#synchronizing-whatsapp-business-app-data).&lt;br&gt;&lt;br&gt;Offboard the user and re-onboard them.",
+      "solutionEn": "You can only initiate contacts and messaging history synchronization of an onboarded WhatsApp Business app user within 24 hours of onboarding the user. See [Onboarding business app users](https://developers.facebook.com/documentation/business-messaging/whatsapp/embedded-signup/onboarding-business-app-users#synchronizing-whatsapp-business-app-data).Offboard the user and re-onboard them.",
       "solutionZh": "先在源商业中心释放该号码所有权，或联系 Meta 商业技术支持协助执行号码接入模式切换。",
       "severity": "blocker",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "relatedLinks": [
+        {
+          "title": "Onboarding business app users",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/embedded-signup/onboarding-business-app-users#synchronizing-whatsapp-business-app-data"
+        }
+      ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Cloud API Onboarding Mismatch\",\n    \"type\": \"OAuthException\",\n    \"code\": 2593108,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Synchronization request can only be made within 24 hours of onboarding\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {

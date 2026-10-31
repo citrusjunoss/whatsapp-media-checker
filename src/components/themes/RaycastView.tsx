@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { FormattedText } from '../common/FormattedText';
 import {
   getLoadedErrorDataset,
   searchErrors,
@@ -508,7 +509,7 @@ export const RaycastView: React.FC<RaycastViewProps> = ({
                       业务原因剖析 (Root Cause)
                     </div>
                     <p className="text-[#d4d4d8] leading-relaxed">
-                      {selectedItem.detailsZh}
+                      <FormattedText text={selectedItem.detailsZh} linkColor="text-emerald-400 hover:text-emerald-300 underline font-medium" />
                     </p>
                   </div>
 
@@ -546,11 +547,42 @@ export const RaycastView: React.FC<RaycastViewProps> = ({
                             <button className="shrink-0 mt-0.5 text-emerald-400">
                               {isDone ? <CheckSquare className="w-3.5 h-3.5" /> : <Square className="w-3.5 h-3.5" />}
                             </button>
-                            <span className="leading-snug">{step}</span>
+                            <span className="leading-snug">
+                              <FormattedText text={step} linkColor="text-emerald-400 hover:text-emerald-300 underline font-medium" />
+                            </span>
                           </div>
                         );
                       })}
                   </div>
+
+                  {/* Official Sub-page Drill-down Links */}
+                  {selectedItem.relatedLinks && selectedItem.relatedLinks.length > 0 && (
+                    <div className="p-3.5 rounded-lg bg-[#1a1a1e] border border-blue-500/20 space-y-2 text-xs">
+                      <div className="font-mono text-[10px] text-blue-400 font-bold uppercase flex items-center justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
+                          <span>官方二级下钻指引与工具 (Official Guides & Tools)</span>
+                        </span>
+                        <span className="text-[10px] text-[#71717a] font-normal">点击直达官方页面</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-1.5">
+                        {selectedItem.relatedLinks.map((link, idx) => (
+                          <a
+                            key={idx}
+                            href={link.url}
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            className="flex items-center justify-between p-2 rounded bg-[#27272a]/40 hover:bg-[#27272a] border border-[#3f3f46]/40 hover:border-emerald-500/50 text-[#e4e4e7] hover:text-white transition-colors group text-xs font-mono"
+                          >
+                            <span className="truncate group-hover:text-emerald-400 font-medium">
+                              {link.title}
+                            </span>
+                            <ExternalLink className="w-3 h-3 text-[#71717a] group-hover:text-emerald-400 shrink-0 ml-2" />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Simulated Payload */}
                   <div className="space-y-1.5 text-xs font-mono">

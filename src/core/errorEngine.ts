@@ -2,6 +2,11 @@ import errorsData from '../data/whatsapp-errors.json';
 
 export type ErrorSeverity = 'blocker' | 'client_error' | 'rate_limit' | 'service_unavailable';
 
+export interface ErrorRelatedLink {
+  title: string;
+  url: string;
+}
+
 export interface WhatsAppErrorItem {
   code: string | number;
   subcode?: number;
@@ -18,6 +23,7 @@ export interface WhatsAppErrorItem {
   severity: ErrorSeverity;
   httpStatus?: number;
   docUrl?: string;
+  relatedLinks?: ErrorRelatedLink[];
   examplePayload?: string;
   contributor?: string;
 }
@@ -116,6 +122,17 @@ export function searchErrors(
     if (item.detailsZh?.toLowerCase().includes(trimmed)) return true;
     if (item.solutionZh?.toLowerCase().includes(trimmed)) return true;
     if (item.categoryNameZh?.toLowerCase().includes(trimmed)) return true;
+
+    // Related links search
+    if (
+      item.relatedLinks?.some(
+        (link) =>
+          link.title.toLowerCase().includes(trimmed) ||
+          link.url.toLowerCase().includes(trimmed)
+      )
+    ) {
+      return true;
+    }
 
     return false;
   });
