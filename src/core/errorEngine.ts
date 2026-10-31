@@ -1,6 +1,12 @@
 import errorsData from '../data/whatsapp-errors.json';
+import { getManualErrorNotes, type ManualErrorNote } from './errorNotes';
 
 export type ErrorSeverity = 'blocker' | 'client_error' | 'rate_limit' | 'service_unavailable';
+
+export interface ErrorRelatedLink {
+  title: string;
+  url: string;
+}
 
 export interface WhatsAppErrorItem {
   code: string | number;
@@ -18,8 +24,10 @@ export interface WhatsAppErrorItem {
   severity: ErrorSeverity;
   httpStatus?: number;
   docUrl?: string;
+  relatedLinks?: ErrorRelatedLink[];
   examplePayload?: string;
   contributor?: string;
+  manualNotes?: ManualErrorNote[];
 }
 
 export interface ErrorDataset {
@@ -68,14 +76,23 @@ export const POPULAR_ERROR_CODES = [
   { code: 190, label: '190 · Token 过期失效', tag: '鉴权', provider: 'meta' },
 ];
 
+// Human notes are kept outside the generated dataset so official sync cannot overwrite them.
+const loadedDataset: ErrorDataset = {
+  ...errorsData as ErrorDataset,
+  items: (errorsData as ErrorDataset).items.map((item) => ({
+    ...item,
+    manualNotes: getManualErrorNotes(item),
+  })),
+};
+
 export function getLoadedErrorDataset(): ErrorDataset {
-  return errorsData as ErrorDataset;
+  return loadedDataset;
 }
 
 export function searchErrors(
   query: string,
   category: string = 'all',
-  dataset: WhatsAppErrorItem[] = (errorsData as ErrorDataset).items,
+  dataset: WhatsAppErrorItem[] = loadedDataset.items,
   provider: string = 'all'
 ): WhatsAppErrorItem[] {
   const trimmed = query.trim().toLowerCase();
@@ -116,6 +133,21 @@ export function searchErrors(
     if (item.detailsZh?.toLowerCase().includes(trimmed)) return true;
     if (item.solutionZh?.toLowerCase().includes(trimmed)) return true;
     if (item.categoryNameZh?.toLowerCase().includes(trimmed)) return true;
+
+    if (item.manualNotes?.some((note) =>
+      `${note.title}\n${note.body}`.toLowerCase().includes(trimmed)
+    )) return true;
+
+    // Related links search
+    if (
+      item.relatedLinks?.some(
+        (link) =>
+          link.title.toLowerCase().includes(trimmed) ||
+          link.url.toLowerCase().includes(trimmed)
+      )
+    ) {
+      return true;
+    }
 
     return false;
   });

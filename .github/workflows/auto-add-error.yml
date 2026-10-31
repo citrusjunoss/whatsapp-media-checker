@@ -11,7 +11,11 @@ permissions:
 jobs:
   validate-or-apply:
     runs-on: ubuntu-latest
-    if: contains(github.event.issue.labels.*.name, 'error-candidate') || github.event.label.name == 'approved' || github.event.label.name == 'auto-merge'
+    # Notes are curated separately and must never overwrite official error fields.
+    if: >-
+      !contains(github.event.issue.labels.*.name, 'manual-note') &&
+      !startsWith(github.event.issue.title, '[人工备注]') &&
+      (contains(github.event.issue.labels.*.name, 'error-candidate') || github.event.label.name == 'approved' || github.event.label.name == 'auto-merge')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -41,22 +45,22 @@ jobs:
                 const item = res.item;
                 const comment = `### ✅ 错误代码格式校验通过 (Validation Passed)
   
-| 字段 | 提取结果 |
-| :--- | :--- |
-| **渠道服务商 (Provider)** | \`${item.providerNameZh} (${item.provider})\` |
-| **错误代码 (Code)** | \`#${item.code}\` |
-| **严重级别 (Severity)** | \`${item.severity}\` |
-| **分类 (Category)** | \`${item.categoryNameZh} (${item.category})\` |
-| **中文名称 (Title Zh)** | **${item.titleZh}** |
-| **英文原名 (Title En)** | ${item.titleEn} |
-| **HTTP Code** | ${item.httpStatus || "N/A"} |
+          | 字段 | 提取结果 |
+          | :--- | :--- |
+          | **渠道服务商 (Provider)** | \`${item.providerNameZh} (${item.provider})\` |
+          | **错误代码 (Code)** | \`#${item.code}\` |
+          | **严重级别 (Severity)** | \`${item.severity}\` |
+          | **分类 (Category)** | \`${item.categoryNameZh} (${item.category})\` |
+          | **中文名称 (Title Zh)** | **${item.titleZh}** |
+          | **英文原名 (Title En)** | ${item.titleEn} |
+          | **HTTP Code** | ${item.httpStatus || "N/A"} |
 
-#### 预览 JSON 报文
-\`\`\`json
-${JSON.stringify(item, null, 2)}
-\`\`\`
+          #### 预览 JSON 报文
+          \`\`\`json
+          ${JSON.stringify(item, null, 2)}
+          \`\`\`
 
-> 💡 **状态说明**：本项目已启用 **维护者审核确认策略 (Strategy B)**。维护者查验无误后打上 \`approved\` 标签，系统将自动合入主分支并部署发布。`;
+          > 💡 **状态说明**：本项目已启用 **维护者审核确认策略 (Strategy B)**。维护者查验无误后打上 \`approved\` 标签，系统将自动合入主分支并部署发布。`;
 
                 // Post comment to Issue via GitHub API
                 await fetch(`https://api.github.com/repos/${repo}/issues/${issueNumber}/comments`, {

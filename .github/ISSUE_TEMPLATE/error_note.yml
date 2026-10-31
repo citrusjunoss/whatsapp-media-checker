@@ -1,0 +1,69 @@
+name: 错误码人工备注 / 实践评论
+description: 补充实践经验、复现条件或解读，维护者审核通过后自动同步到站点
+title: "[人工备注] "
+labels: ["manual-note"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请保留预填标题中的服务商和错误码，便于从工具中找到讨论。提交后可在本 Issue 继续评论。
+        人工备注与官方说明分开保存；维护者添加 note-approved 标签后自动同步到站点。修改正文后需要重新审核，普通评论不会自动收录。请勿填写 Token、完整手机号等敏感信息。
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 备注类型
+      options:
+        - observation (实践观察)
+        - interpretation (补充解读，含 AI 辅助解读)
+    validations:
+      required: true
+  - type: input
+    id: provider
+    attributes:
+      label: 服务商渠道
+      placeholder: meta / aliyun / twilio / other
+    validations:
+      required: true
+  - type: input
+    id: code
+    attributes:
+      label: 错误代码
+      placeholder: "130472"
+    validations:
+      required: true
+  - type: input
+    id: subcode
+    attributes:
+      label: 错误子码（如有）
+  - type: input
+    id: official_url
+    attributes:
+      label: 官方说明链接
+  - type: textarea
+    id: context
+    attributes:
+      label: 发生场景与复现条件
+      description: 请注明发生日期、发送方/接收方、账号注册时间、模板类别、会话窗口及复现步骤。
+    validations:
+      required: true
+  - type: textarea
+    id: observation
+    attributes:
+      label: 实践观察
+      description: 写明实际现象、样本量、失败次数/总次数和尝试过的处理办法；没有实测请填写“未实测”。
+    validations:
+      required: true
+  - type: textarea
+    id: interpretation
+    attributes:
+      label: 原因解读与处理建议
+      description: 区分官方已确认内容、个人推测和 AI 辅助解读，标明哪些结论仍待核验。
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 证据与参考资料
+      description: 可贴脱敏回执、截图、官方下钻链接；尚无证据请填写“待补充”。
+    validations:
+      required: true

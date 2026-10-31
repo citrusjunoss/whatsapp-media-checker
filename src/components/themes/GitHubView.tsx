@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
+import { FormattedText } from '../common/FormattedText';
+import { ErrorNotes } from '../common/ErrorNotes';
 import {
   getLoadedErrorDataset,
   searchErrors,
@@ -400,7 +402,7 @@ export const GitHubView: React.FC<GitHubViewProps> = ({
                       <CircleDot className="w-3.5 h-3.5" />
                       <span>Open</span>
                     </span>
-                    <span>meta-graph-api opened this issue · 2 comments</span>
+                    <span>错误码知识库 · {selectedIssue.manualNotes?.length || 0} 条人工备注</span>
                   </div>
                 </div>
 
@@ -433,6 +435,8 @@ export const GitHubView: React.FC<GitHubViewProps> = ({
                   <p>{selectedIssue.detailsZh}</p>
                 </div>
               </div>
+
+              <ErrorNotes item={selectedIssue} />
 
               {/* Comment 2: WhatsApp Dev Bot Checklist */}
               <div className="border border-[#30363d] rounded-md overflow-hidden bg-[#0d1117]">
@@ -478,11 +482,38 @@ export const GitHubView: React.FC<GitHubViewProps> = ({
                             <button className="shrink-0 mt-0.5 text-[#3fb950]">
                               {isChecked ? <CheckSquare className="w-3.5 h-3.5" /> : <Square className="w-3.5 h-3.5" />}
                             </button>
-                            <span>{step}</span>
+                            <span>
+                              <FormattedText text={step} linkColor="text-[#58a6ff] hover:text-[#79c0ff] underline font-medium" />
+                            </span>
                           </div>
                         );
                       })}
                   </div>
+
+                  {/* Official Sub-page Drilldown Links */}
+                  {selectedIssue.relatedLinks && selectedIssue.relatedLinks.length > 0 && (
+                    <div className="pt-2 space-y-1.5 font-mono border-t border-[#30363d]">
+                      <div className="font-semibold text-white flex items-center gap-1.5">
+                        <ExternalLink className="w-3.5 h-3.5 text-[#58a6ff]" />
+                        <span>### 🔗 Official Drill-down Guides & Tools (二级下钻指引)</span>
+                      </div>
+                      <ul className="list-disc list-inside space-y-1 text-[#8b949e] pl-1">
+                        {selectedIssue.relatedLinks.map((link, idx) => (
+                          <li key={idx} className="truncate">
+                            <a
+                              href={link.url}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                              className="text-[#58a6ff] hover:underline inline-flex items-center gap-1 ml-1"
+                            >
+                              <span>{link.title}</span>
+                              <ExternalLink className="w-3 h-3 opacity-70" />
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   {/* Unified Diff Box */}
                   <div className="pt-2">

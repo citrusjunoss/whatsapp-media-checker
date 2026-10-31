@@ -1,0 +1,68 @@
+name: Review and Sync Manual Error Notes
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+
+permissions: {}
+
+concurrency:
+  group: manual-note-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: >-
+      (contains(github.event.issue.labels.*.name, 'manual-note') || startsWith(github.event.issue.title, '[人工备注]')) &&
+      (github.event.action != 'labeled' || github.event.label.name == 'note-approved')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    outputs:
+      publish: ${{ steps.sync.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Validate or sync approved note
+        id: sync
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { syncNoteIssue } = await import(`${process.env.GITHUB_WORKSPACE}/scripts/ingest-issue-note.mjs`);
+            await syncNoteIssue({ github, context, core });
+
+  deploy:
+    needs: sync
+    if: needs.sync.outputs.publish == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: main
+
+  report:
+    needs: [sync, deploy]
+    if: always() && needs.sync.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/github-script@v7
+        env:
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+        with:
+          script: |
+            const { updateNoteStatus } = await import(`${process.env.GITHUB_WORKSPACE}/scripts/ingest-issue-note.mjs`);
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const message = process.env.DEPLOY_RESULT === 'success'
+              ? `✅ 审核通过，人工备注已自动同步并发布到站点。可在本 Issue 继续讨论；若需修改站点备注，请编辑正文并重新审核。\n\n[查看工作流](${runUrl})`
+              : `⚠️ 人工备注已同步到仓库，但本次站点发布未完成（${process.env.DEPLOY_RESULT}）。请检查并重新运行工作流。\n\n[查看工作流](${runUrl})`;
+            await updateNoteStatus(github, context.repo, context.issue.number, message);

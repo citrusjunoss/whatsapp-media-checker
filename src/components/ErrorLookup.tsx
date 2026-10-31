@@ -1,4 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { FormattedText } from './common/FormattedText';
+import { ErrorNotes } from './common/ErrorNotes';
+import { formatManualErrorNotes } from '../core/errorNotes';
 import {
   getLoadedErrorDataset,
   searchErrors,
@@ -319,6 +322,9 @@ ${item.solutionZh}
 
 【运维策略建议】:
 ${advice.advice}
+
+【人工备注（经验/解读，非官方规则）】:
+${formatManualErrorNotes(item.manualNotes)}
 
 【官方文档链接】:
 ${item.docUrl || 'https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes'}`;
@@ -716,6 +722,7 @@ ${item.docUrl || 'https://developers.facebook.com/docs/whatsapp/cloud-api/suppor
 
               {/* Detail Tab Contents */}
               <div className="p-5 space-y-4">
+                <ErrorNotes item={selectedItem} />
                 {detailTab === 'checklist' && (
                   <div className="space-y-4">
                     {/* Interactive Checklist */}
@@ -750,16 +757,47 @@ ${item.docUrl || 'https://developers.facebook.com/docs/whatsapp/cloud-api/suppor
                                   <Square className="w-4 h-4 app-text-dim" />
                                 )}
                               </button>
-                              <span className="leading-relaxed font-sans">{step}</span>
+                              <span className="leading-relaxed font-sans">
+                                <FormattedText text={step} linkColor="text-emerald-500 hover:text-emerald-400 underline font-medium" />
+                              </span>
                             </div>
                           );
                         })}
                       </div>
 
+                      {/* Official Drill-down Links */}
+                      {selectedItem.relatedLinks && selectedItem.relatedLinks.length > 0 && (
+                        <div className="pt-3 border-t app-border space-y-2">
+                          <div className="text-[11px] font-mono font-semibold text-blue-400 uppercase flex items-center justify-between">
+                            <span className="flex items-center gap-1.5">
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              <span>官方二级下钻指引与工具 (Official Drill-down)</span>
+                            </span>
+                            <span className="text-[10px] app-text-dim font-normal">点击直达官方页面</span>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {selectedItem.relatedLinks.map((link, idx) => (
+                              <a
+                                key={idx}
+                                href={link.url}
+                                target="_blank"
+                                rel="noreferrer noopener"
+                                className="flex items-center justify-between p-2 rounded-md app-surface border app-border hover:border-emerald-500/50 text-xs app-text-main transition-colors group font-mono"
+                              >
+                                <span className="truncate group-hover:text-emerald-500 font-medium">
+                                  {link.title}
+                                </span>
+                                <ExternalLink className="w-3 h-3 app-text-dim group-hover:text-emerald-500 shrink-0 ml-2" />
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       {selectedItem.solutionEn && selectedItem.solutionEn !== selectedItem.solutionZh && (
                         <div className="pt-2 border-t app-border text-[11px] font-mono app-text-dim leading-relaxed">
                           <div className="font-semibold mb-0.5 text-[10px] uppercase">Official Resolution Advice:</div>
-                          {selectedItem.solutionEn}
+                          <FormattedText text={selectedItem.solutionEn} linkColor="text-emerald-500 hover:text-emerald-400 underline" />
                         </div>
                       )}
                     </div>
@@ -772,7 +810,7 @@ ${item.docUrl || 'https://developers.facebook.com/docs/whatsapp/cloud-api/suppor
                           <span>业务原因与故障机制 (Diagnosis)</span>
                         </div>
                         <p className="app-text-muted leading-relaxed whitespace-pre-line text-xs font-sans">
-                          {selectedItem.detailsZh}
+                          <FormattedText text={selectedItem.detailsZh} linkColor="text-blue-400 hover:underline" />
                         </p>
                       </div>
 
