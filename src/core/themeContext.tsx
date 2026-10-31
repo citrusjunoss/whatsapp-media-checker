@@ -36,6 +36,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.style.colorScheme = theme === 'stripe' ? 'light' : 'dark';
     if (theme === 'stripe') {
       document.documentElement.classList.remove('dark');
     } else {

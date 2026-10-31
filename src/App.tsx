@@ -43,7 +43,7 @@ function MainApp() {
         onOpenRules={() => setIsRulesOpen(true)}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
         {activeNav === 'file_tools' ? (
           <FileToolsView onOpenRules={() => setIsRulesOpen(true)} />
         ) : (
@@ -57,7 +57,7 @@ function MainApp() {
       />
 
       <footer className="border-t app-border py-4 mt-8 app-surface-subtle text-xs font-mono app-text-dim transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>
             WhatsApp DevTools · Client-side Only · Zero Server Storage
           </div>
