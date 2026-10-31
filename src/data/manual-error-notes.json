@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "id": "github-issue-1",
+    "provider": "meta",
+    "code": 130472,
+    "kind": "interpretation",
+    "title": "130472 · 补充解读",
+    "body": "发生场景与复现条件\n这个所谓的“营销消息实验”（报错代码 130472），其实就是 WhatsApp 官方随机抽了一小批用户，给他们开了“免打扰保护盾”。\nWhatsApp 想测试一下：“如果完全不让商家给这批人发广告，他们的使用体验会不会更好？”\n具体规则非常直接：\n发生了什么： 只要某个用户被官方抽中进了这个“实验组”，任何商家主动给他发的营销推广消息（Marketing 模板），都会被 WhatsApp 半路拦截，根本发不出去。\n扣不扣费： 既然被官方拦下了，不会扣你的钱，你的后台会收到一个 130472 的发送失败报错。\n能不能申诉关闭： 不能。 这是官方强制的随机抽样，商家没法申请白名单，用户自己也不知道被抽中了。\n重发有用吗： 没用。 只要他还在实验组里，你再点 100 次重发，依然会被拦截报错。\n那怎么才能把消息发给这批人？（破盾方法）\n除非满足以下任意一个条件，否则营销消息永远发不过去：\n他主动找你聊天了： 只要这个用户在过去 24 小时内主动在 WhatsApp 上给你发过消息（比如问客服问题），保护盾就会暂时解除，这 24 小时内你可以随便给他发营销消息。\n他点你的广告进来的： 他通过点击 Facebook/Instagram 上的广告跳转到你的 WhatsApp 并聊了起来（开启了 72 小时免费窗口）。\n发的是正经通知，不是广告： 这个实验只拦截“营销类（Marketing）”消息。如果你发的是“物流通知”、“订单确认”等公用事业类（Utility）消息，或者“验证码（Authentication）”，是不受影响的，照常能发出去。\n给你的实际建议：\n如果看到 130472 报错，不要让系统死循环重发。如果这条信息非发不可，直接换 短信（SMS）或邮件 联系他；或者在短信里引导他去 WhatsApp 给你回句话，只要他一回话，你就能在 WhatsApp 上正常给他发消息了。\n\n实践观察\n实际操作中，给新注册的 whatsapp账号发送营销消息，有很大的概率会触发该错误。\n\n原因解读与处理建议\n建议在营销推广中，发送给正式使用的活跃账号\n\n证据与参考资料\n待补充\n\n官方说明链接\nhttps://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+    "author": "citrusjunoss",
+    "recordedAt": "2026-10-31",
+    "approvedBy": "citrusjunoss",
+    "issueUrl": "https://github.com/citrusjunoss/whatsapp-media-checker/issues/1",
+    "sourceHash": "064c384ec685360dc1ab8429706de665f765f0fac0debe1530a8a645307c6b11"
+  }
+]
