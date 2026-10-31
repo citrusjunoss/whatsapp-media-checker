@@ -184,10 +184,10 @@ export const ErrorLookup: React.FC = () => {
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [severityFilter, setSeverityFilter] = useState<'all' | ErrorSeverity>('all');
-  const [selectedCode, setSelectedCode] = useState<number | null>(131047);
+  const [selectedCode, setSelectedCode] = useState<string | number | null>(131047);
   const [copiedType, setCopiedType] = useState<'report' | 'payload' | 'curl' | null>(null);
   const [detailTab, setDetailTab] = useState<'checklist' | 'payload' | 'curl'>('checklist');
-  const [checkedSteps, setCheckedSteps] = useState<Record<number, Record<number, boolean>>>({});
+  const [checkedSteps, setCheckedSteps] = useState<Record<string | number, Record<number, boolean>>>({});
 
   const inputRef = useRef<HTMLInputElement>(null);
   const activeItemRef = useRef<HTMLDivElement>(null);
@@ -287,7 +287,7 @@ export const ErrorLookup: React.FC = () => {
     return selectedItem ? generateSimulatedCurl(selectedItem) : '';
   }, [selectedItem]);
 
-  const toggleStep = (code: number, stepIndex: number) => {
+  const toggleStep = (code: string | number, stepIndex: number) => {
     setCheckedSteps((prev) => ({
       ...prev,
       [code]: {

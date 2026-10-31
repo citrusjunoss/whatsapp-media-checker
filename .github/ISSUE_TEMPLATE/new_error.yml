@@ -1,0 +1,135 @@
+name: 补充/收录新错误代码 (New WhatsApp Error Code)
+description: 提交 Meta 官方或第三方服务商（如阿里云 ChatApp、Twilio）的 WhatsApp 错误代码，经审核后自动合入知识库
+title: "[Error Submission]: "
+labels: ["error-candidate"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢为 WhatsApp 开发者工具贡献错误字典！请按要求填写以下字段，系统将通过 GitHub Action 自动解析校验并在维护者确认后合并发布。
+
+  - type: dropdown
+    id: provider
+    attributes:
+      label: 服务商渠道 (Provider)
+      description: 该错误码所属的服务商平台
+      options:
+        - "aliyun (阿里云国际即时通讯 ChatApp)"
+        - "meta (Meta WhatsApp 官方 Graph API)"
+        - "twilio (Twilio Messaging)"
+        - "other (其他三方服务商 / BSP)"
+    validations:
+      required: true
+
+  - type: input
+    id: code
+    attributes:
+      label: 错误代码 (Error Code)
+      description: 接口返回的精确错误码（Meta 如 131047，阿里云如 isv.TEMPLATE_PARAM_INVALID）
+      placeholder: "例如：isv.TEMPLATE_PARAM_INVALID 或 131047"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 严重级别 (Severity)
+      description: 错误对业务发送的影响程度
+      options:
+        - "client_error (客户端参数或状态错误)"
+        - "rate_limit (频率限制与流控限额)"
+        - "blocker (账号封禁或阻断性违规)"
+        - "service_unavailable (服务端暂时不可用)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 业务分类 (Category)
+      description: 错误所属的业务阶段
+      options:
+        - "template (消息模板与参数校验)"
+        - "messaging (消息发送与接收)"
+        - "rate_limit (频率与流控)"
+        - "account (商业账号与 WABA 状态)"
+        - "authentication (鉴权与 Token)"
+        - "registration (号码注册与绑定)"
+        - "media (多媒体上传与处理)"
+        - "general (通用网关与常规错误)"
+    validations:
+      required: true
+
+  - type: input
+    id: title_zh
+    attributes:
+      label: 中文错误简述 (Title Zh)
+      description: 简明扼要概括错误含义（建议控制在 25 字以内）
+      placeholder: "例如：模板入参变量不匹配或格式错误"
+    validations:
+      required: true
+
+  - type: input
+    id: title_en
+    attributes:
+      label: 英文官方定义 (Title En)
+      description: 官方技术文档中的英文错误原称
+      placeholder: "例如：Template Parameter Invalid or Mismatched"
+    validations:
+      required: true
+
+  - type: textarea
+    id: details_zh
+    attributes:
+      label: 触发原因深度剖析 (Details Zh)
+      description: 详细描述该错误是在什么场景下触发的？底层机制是什么？
+      placeholder: "例如：调用阿里云 ChatApp (国际即时通信) 接口发送 WhatsApp 消息时，传入的 templateParams 键值对或数量与阿里云审核通过的模板占位符不匹配..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution_zh
+    attributes:
+      label: 排查与解决步骤清单 (Solution Zh)
+      description: 具体的行动项列表。前台工具将按行/分号渲染为可打勾的任务清单！
+      placeholder: |
+        1. 登录控制台核对该 TemplateCode 的变量数量与顺序；
+        2. 检查请求体 templateParams 是否有空值或未转义的双引号；
+        3. 确保变量内容未超出 WhatsApp 字符长度限制；
+        4. 动态按钮参数需通过 buttonComponents 独立传入。
+    validations:
+      required: true
+
+  - type: input
+    id: http_status
+    attributes:
+      label: HTTP 响应状态码 (HTTP Status)
+      description: 接口返回的 HTTP Code（如 200, 400, 401, 403, 429, 500）
+      placeholder: "200"
+
+  - type: textarea
+    id: example_payload
+    attributes:
+      label: 真实错误报文示例 (Example Payload JSON)
+      description: 脱敏后的 JSON 报错响应报文
+      placeholder: |
+        {
+          "RequestId": "90637F8E-0083-5A3F-BD48-C272824DA40E",
+          "Code": "isv.TEMPLATE_PARAM_INVALID",
+          "Message": "Template parameter is invalid. Please check templateParams JSON array."
+        }
+      render: json
+
+  - type: input
+    id: doc_url
+    attributes:
+      label: 官方文档或工单链接 (Documentation URL)
+      description: 服务商官方对该错误码的说明链接
+      placeholder: "https://help.aliyun.com/document_detail/416399.html"
+
+  - type: input
+    id: contributor
+    attributes:
+      label: 贡献者署名 (Contributor GitHub Handle)
+      description: 您的 GitHub 用户名（将作为贡献者署名展示在错误卡片中）
+      placeholder: "@your-github-username"

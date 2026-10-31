@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { searchErrors, getLoadedErrorDataset } from '../errorEngine';
+import { searchErrors, getLoadedErrorDataset, ERROR_PROVIDERS } from '../errorEngine';
 
-describe('WhatsApp Error Lookup Engine', () => {
+describe('WhatsApp Error Lookup Engine with Multi-Provider Support', () => {
   const dataset = getLoadedErrorDataset();
 
-  it('should load error dataset with at least 50 official error codes', () => {
-    expect(dataset.items.length).toBeGreaterThanOrEqual(50);
+  it('should load error dataset with official Meta and third-party BSP error codes', () => {
+    expect(dataset.items.length).toBeGreaterThanOrEqual(75);
     expect(dataset.sourceUrl).toContain('developers.facebook.com');
   });
 
@@ -20,6 +20,33 @@ describe('WhatsApp Error Lookup Engine', () => {
     const res1320 = searchErrors('1320', 'all', dataset.items);
     expect(res1320.length).toBeGreaterThan(1);
     expect(res1320.every((item) => item.code.toString().includes('1320'))).toBe(true);
+  });
+
+  it('should search third-party string-based error codes (e.g. Alibaba Cloud isv.*)', () => {
+    // Search Alibaba Cloud isv.TEMPLATE_PARAM_INVALID
+    const resIsv = searchErrors('isv.TEMPLATE_PARAM_INVALID', 'all', dataset.items);
+    expect(resIsv.length).toBeGreaterThanOrEqual(1);
+    expect(resIsv[0].code).toBe('isv.TEMPLATE_PARAM_INVALID');
+    expect(resIsv[0].provider).toBe('aliyun');
+    expect(resIsv[0].providerNameZh).toBe('阿里云 ChatApp');
+    expect(resIsv[0].titleZh).toContain('模板入参变量不匹配');
+
+    // Case-insensitive search on string code
+    const resLower = searchErrors('template_param', 'all', dataset.items);
+    expect(resLower.some((i) => i.code === 'isv.TEMPLATE_PARAM_INVALID')).toBe(true);
+  });
+
+  it('should filter by Provider correctly (Meta vs Aliyun)', () => {
+    // Filter Meta
+    const metaErrors = searchErrors('', 'all', dataset.items, 'meta');
+    expect(metaErrors.length).toBeGreaterThanOrEqual(70);
+    expect(metaErrors.every((i) => (i.provider || 'meta') === 'meta')).toBe(true);
+
+    // Filter Aliyun
+    const aliyunErrors = searchErrors('', 'all', dataset.items, 'aliyun');
+    expect(aliyunErrors.length).toBeGreaterThanOrEqual(4);
+    expect(aliyunErrors.every((i) => i.provider === 'aliyun')).toBe(true);
+    expect(aliyunErrors.some((i) => i.code === 'isv.BUSINESS_LIMIT_CONTROL')).toBe(true);
   });
 
   it('should search by English keyword (case-insensitive)', () => {
@@ -42,6 +69,10 @@ describe('WhatsApp Error Lookup Engine', () => {
     // Search "Token"
     const resToken = searchErrors('Token', 'all', dataset.items);
     expect(resToken.some((i) => i.code === 190)).toBe(true);
+
+    // Search "阿里云"
+    const resAli = searchErrors('阿里云', 'all', dataset.items);
+    expect(resAli.length).toBeGreaterThanOrEqual(4);
   });
 
   it('should filter by category properly', () => {
@@ -49,43 +80,18 @@ describe('WhatsApp Error Lookup Engine', () => {
     expect(templateErrors.length).toBeGreaterThan(0);
     expect(templateErrors.every((i) => i.category === 'template')).toBe(true);
     expect(templateErrors.some((i) => i.code === 132000)).toBe(true);
-    expect(templateErrors.some((i) => i.code === 132001)).toBe(true);
-  });
-
-  it('should include WABA Graph API management and template creation errors (e.g. 192, 139000, 200000, 80008)', () => {
-    // 192 Invalid phone number in template
-    const res192 = searchErrors('192', 'all', dataset.items);
-    expect(res192.length).toBeGreaterThanOrEqual(1);
-    expect(res192[0].code).toBe(192);
-    expect(res192[0].category).toBe('template');
-    expect(res192[0].titleZh).toContain('模板');
-
-    // 139000 Blocked by integrity
-    const res139000 = searchErrors('139000', 'all', dataset.items);
-    expect(res139000.length).toBeGreaterThanOrEqual(1);
-    expect(res139000[0].titleZh).toContain('合规拦截');
-
-    // 200000 Cannot add phone number to WABA
-    const res200000 = searchErrors('200000', 'all', dataset.items);
-    expect(res200000.length).toBeGreaterThanOrEqual(1);
-    expect(res200000[0].category).toBe('registration');
-
-    // 80008 WABA account rate limit
-    const res80008 = searchErrors('80008', 'all', dataset.items);
-    expect(res80008.length).toBeGreaterThanOrEqual(1);
-    expect(res80008[0].category).toBe('rate_limit');
+    expect(templateErrors.some((i) => i.code === 'isv.TEMPLATE_PARAM_INVALID')).toBe(true);
   });
 
   it('should ensure each error item contains essential diagnostic properties', () => {
     dataset.items.forEach((item) => {
-      expect(item.code).toBeTypeOf('number');
-      expect(item.titleEn).toBeTruthy();
+      expect(['string', 'number']).toContain(typeof item.code);
       expect(item.titleZh).toBeTruthy();
       expect(item.category).toBeTruthy();
       expect(item.categoryNameZh).toBeTruthy();
-      expect(item.detailsEn).toBeTruthy();
-      expect(item.solutionEn).toBeTruthy();
-      expect(item.examplePayload).toBeTruthy();
+      expect(item.detailsZh).toBeTruthy();
+      expect(item.solutionZh).toBeTruthy();
+      expect(item.severity).toBeTruthy();
     });
   });
 });

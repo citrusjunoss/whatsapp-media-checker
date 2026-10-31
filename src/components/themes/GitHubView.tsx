@@ -55,11 +55,12 @@ export const GitHubView: React.FC<GitHubViewProps> = ({
 
   const [query, setQuery] = useState('');
   const [labelFilter, setLabelFilter] = useState<'all' | 'blocker' | 'rate_limit' | 'template' | 'auth'>('all');
+  const [providerFilter, setProviderFilter] = useState<string>('all');
 
   // Selected Issue for GitHub Discussion view
   const [selectedIssue, setSelectedIssue] = useState<WhatsAppErrorItem | null>(null);
   const [copiedText, setCopiedText] = useState<string | null>(null);
-  const [checkedItems, setCheckedItems] = useState<Record<number, Record<number, boolean>>>({});
+  const [checkedItems, setCheckedItems] = useState<Record<string | number, Record<number, boolean>>>({});
 
   // Media state (PR Diff view)
   const [mediaFile, setMediaFile] = useState<File | null>(null);
@@ -69,7 +70,7 @@ export const GitHubView: React.FC<GitHubViewProps> = ({
 
   // Filtered issues
   const filteredIssues = useMemo(() => {
-    let list = searchErrors(query, 'all', dataset.items);
+    let list = searchErrors(query, 'all', dataset.items, providerFilter);
     if (labelFilter === 'blocker') {
       list = list.filter((i) => i.severity === 'blocker');
     } else if (labelFilter === 'rate_limit') {
@@ -80,7 +81,7 @@ export const GitHubView: React.FC<GitHubViewProps> = ({
       list = list.filter((i) => i.category === 'authentication');
     }
     return list;
-  }, [query, labelFilter, dataset.items]);
+  }, [query, labelFilter, providerFilter, dataset.items]);
 
   const handleInspectMedia = async (file: File) => {
     setMediaFile(file);
@@ -235,28 +236,51 @@ export const GitHubView: React.FC<GitHubViewProps> = ({
                   )}
                 </div>
 
-                {/* Label filters */}
-                <div className="flex items-center space-x-1.5 font-mono text-[11px]">
-                  <span className="text-[#8b949e]">Labels:</span>
-                  {[
-                    { id: 'all', label: 'All' },
-                    { id: 'blocker', label: 'bug: blocker' },
-                    { id: 'rate_limit', label: 'rate-limit' },
-                    { id: 'template', label: 'template' },
-                    { id: 'auth', label: 'auth' },
-                  ].map((l) => (
-                    <button
-                      key={l.id}
-                      onClick={() => setLabelFilter(l.id as any)}
-                      className={`px-2 py-0.5 rounded border transition-colors ${
-                        labelFilter === l.id
-                          ? 'bg-[#30363d] text-white border-[#8b949e]'
-                          : 'border-[#30363d] text-[#8b949e] hover:text-white'
-                      }`}
-                    >
-                      {l.label}
-                    </button>
-                  ))}
+                {/* Provider filters & Label filters */}
+                <div className="flex flex-wrap items-center gap-2 font-mono text-[11px]">
+                  <div className="flex items-center space-x-1 border-r border-[#30363d] pr-2">
+                    <span className="text-[#8b949e]">Provider:</span>
+                    {[
+                      { id: 'all', label: 'All' },
+                      { id: 'meta', label: 'Meta' },
+                      { id: 'aliyun', label: '阿里 ChatApp' },
+                    ].map((p) => (
+                      <button
+                        key={p.id}
+                        onClick={() => setProviderFilter(p.id)}
+                        className={`px-2 py-0.5 rounded border transition-colors ${
+                          providerFilter === p.id
+                            ? 'bg-[#30363d] text-emerald-400 border-emerald-500/50 font-bold'
+                            : 'border-[#30363d] text-[#8b949e] hover:text-white'
+                        }`}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center space-x-1">
+                    <span className="text-[#8b949e]">Labels:</span>
+                    {[
+                      { id: 'all', label: 'All' },
+                      { id: 'blocker', label: 'bug: blocker' },
+                      { id: 'rate_limit', label: 'rate-limit' },
+                      { id: 'template', label: 'template' },
+                      { id: 'auth', label: 'auth' },
+                    ].map((l) => (
+                      <button
+                        key={l.id}
+                        onClick={() => setLabelFilter(l.id as any)}
+                        className={`px-2 py-0.5 rounded border transition-colors ${
+                          labelFilter === l.id
+                            ? 'bg-[#30363d] text-white border-[#8b949e]'
+                            : 'border-[#30363d] text-[#8b949e] hover:text-white'
+                        }`}
+                      >
+                        {l.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -271,54 +295,91 @@ export const GitHubView: React.FC<GitHubViewProps> = ({
                     </span>
                     <span>· 0 Closed</span>
                   </div>
-                  <div className="text-[11px] font-mono">Meta Graph API Verified Repository</div>
+                  <div className="flex items-center space-x-3">
+                    <span className="text-[11px] font-mono hidden md:inline">Multi-Provider Registry</span>
+                    <a
+                      href="https://github.com/citrusjunoss/whatsapp-media-checker/issues/new?template=new_error.yml"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-2.5 py-1 bg-[#238636] hover:bg-[#2ea043] text-white rounded-md text-[11px] font-semibold transition-colors flex items-center space-x-1"
+                    >
+                      <span>New Error Issue</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
                 </div>
 
                 {/* Issues Rows */}
                 <div className="divide-y divide-[#30363d]">
-                  {filteredIssues.map((item) => (
-                    <div
-                      key={item.code}
-                      onClick={() => setSelectedIssue(item)}
-                      className="p-3.5 hover:bg-[#161b22] transition-colors cursor-pointer flex items-start space-x-3"
-                    >
-                      <CircleDot className="w-4 h-4 text-[#3fb950] shrink-0 mt-0.5" />
-                      <div className="flex-1 space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-sm font-semibold text-white hover:text-[#58a6ff]">
-                            {item.titleZh}
-                          </span>
-
-                          {/* GitHub Labels */}
-                          <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-[#f85149]/20 text-[#ff7b72] border border-[#f85149]/30">
-                            #{item.code}
-                          </span>
-
-                          <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-[#1f6feb]/20 text-[#58a6ff] border border-[#1f6feb]/30">
-                            {item.category}
-                          </span>
-
-                          {item.severity === 'blocker' && (
-                            <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-[#da3633]/20 text-[#f85149] border border-[#da3633]/30">
-                              severity: blocker
+                  {filteredIssues.length === 0 ? (
+                    <div className="p-8 text-center space-y-3 font-mono">
+                      <div className="text-xs text-[#8b949e]">No issues matching "{query}"</div>
+                      <a
+                        href={`https://github.com/citrusjunoss/whatsapp-media-checker/issues/new?template=new_error.yml&code=${encodeURIComponent(
+                          query
+                        )}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-[#238636] hover:bg-[#2ea043] text-white text-xs font-semibold rounded-md transition-colors"
+                      >
+                        <span>Submit New Error Issue</span>
+                        <ExternalLink className="w-3 h-3 ml-0.5" />
+                      </a>
+                    </div>
+                  ) : (
+                    filteredIssues.map((item) => (
+                      <div
+                        key={`${item.provider || 'meta'}_${item.code}`}
+                        onClick={() => setSelectedIssue(item)}
+                        className="p-3.5 hover:bg-[#161b22] transition-colors cursor-pointer flex items-start space-x-3"
+                      >
+                        <CircleDot className="w-4 h-4 text-[#3fb950] shrink-0 mt-0.5" />
+                        <div className="flex-1 space-y-1">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="text-sm font-semibold text-white hover:text-[#58a6ff]">
+                              {item.titleZh}
                             </span>
-                          )}
 
-                          {item.severity === 'rate_limit' && (
-                            <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-[#d29922]/20 text-[#e3b341] border border-[#d29922]/30">
-                              sla: throttled
+                            {/* GitHub Labels */}
+                            <span
+                              className={`text-[10px] font-mono px-2 py-0.2 rounded-full border ${
+                                item.provider === 'aliyun'
+                                  ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
+                                  : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                              }`}
+                            >
+                              provider: {item.provider || 'meta'}
                             </span>
-                          )}
-                        </div>
 
-                        <div className="text-xs text-[#8b949e] font-mono">
-                          #{item.code} opened 2 days ago by{' '}
-                          <span className="text-[#c9d1d9]">meta-graph-api[bot]</span> · HTTP{' '}
-                          {item.httpStatus || 400}
+                            <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-[#f85149]/20 text-[#ff7b72] border border-[#f85149]/30">
+                              #{item.code}
+                            </span>
+
+                            <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-[#1f6feb]/20 text-[#58a6ff] border border-[#1f6feb]/30">
+                              {item.category}
+                            </span>
+
+                            {item.severity === 'blocker' && (
+                              <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-[#da3633]/20 text-[#f85149] border border-[#da3633]/30">
+                                severity: blocker
+                              </span>
+                            )}
+
+                            {item.severity === 'rate_limit' && (
+                              <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-[#d29922]/20 text-[#e3b341] border border-[#d29922]/30">
+                                sla: throttled
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="text-xs text-[#8b949e] font-mono">
+                            #{item.code} · {item.providerNameZh || 'Meta WhatsApp 官方'} · HTTP{' '}
+                            {item.httpStatus || 400}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             </div>

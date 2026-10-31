@@ -5,6 +5,7 @@ import {
   POPULAR_ERROR_CODES,
   WhatsAppErrorItem,
   ErrorSeverity,
+  ERROR_PROVIDERS,
 } from '../../core/errorEngine';
 import {
   validateMediaFile,
@@ -31,6 +32,7 @@ import {
   Command,
   FileCode,
   ShieldAlert,
+  PlusCircle,
 } from 'lucide-react';
 import { DropZone } from '../DropZone';
 import { ConverterPanel } from '../ConverterPanel';
@@ -52,9 +54,10 @@ export const RaycastView: React.FC<RaycastViewProps> = ({
 
   // Search & Navigation
   const [query, setQuery] = useState('');
-  const [selectedErrorCode, setSelectedErrorCode] = useState<number>(131047);
+  const [selectedErrorCode, setSelectedErrorCode] = useState<string | number>(131047);
+  const [selectedProvider, setSelectedProvider] = useState<string>('all');
   const [copiedText, setCopiedText] = useState<string | null>(null);
-  const [checkedSteps, setCheckedSteps] = useState<Record<number, Record<number, boolean>>>({});
+  const [checkedSteps, setCheckedSteps] = useState<Record<string | number, Record<number, boolean>>>({});
 
   // Media Inspection State
   const [mediaFile, setMediaFile] = useState<File | null>(null);
@@ -65,7 +68,7 @@ export const RaycastView: React.FC<RaycastViewProps> = ({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listContainerRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const itemRefs = useRef<Record<string | number, HTMLDivElement | null>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Keyboard shortcut: '/' or '⌘K' to focus launcher search
@@ -89,8 +92,8 @@ export const RaycastView: React.FC<RaycastViewProps> = ({
 
   // Filtered error list
   const filteredErrors = useMemo(() => {
-    return searchErrors(query, 'all', dataset.items);
-  }, [query, dataset.items]);
+    return searchErrors(query, 'all', dataset.items, selectedProvider);
+  }, [query, dataset.items, selectedProvider]);
 
   // Keep selected error valid
   useEffect(() => {
@@ -359,37 +362,81 @@ export const RaycastView: React.FC<RaycastViewProps> = ({
                 <span className="text-emerald-400 font-bold">{filteredErrors.length} MATCHED</span>
               </div>
 
+              {/* Provider Filter Tabs */}
+              <div className="px-3 py-1.5 border-b border-[#27272a] bg-[#141416] flex items-center space-x-1 overflow-x-auto dev-scrollbar text-xs">
+                {ERROR_PROVIDERS.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => setSelectedProvider(p.id)}
+                    className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors shrink-0 ${
+                      selectedProvider === p.id
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-bold'
+                        : 'text-[#71717a] hover:text-[#a1a1aa] border border-transparent'
+                    }`}
+                  >
+                    {p.nameZh}
+                  </button>
+                ))}
+              </div>
+
               <div
                 ref={listContainerRef}
                 className="flex-1 overflow-y-auto dev-scrollbar p-2 space-y-1"
               >
-                {filteredErrors.map((item) => {
-                  const isSelected = selectedErrorCode === item.code;
-                  return (
-                    <div
-                      key={item.code}
-                      ref={(el) => {
-                        itemRefs.current[item.code] = el;
-                      }}
-                      onClick={() => setSelectedErrorCode(item.code)}
-                      className={`px-3 py-2.5 rounded-lg text-xs cursor-pointer flex items-center justify-between transition-all ${
-                        isSelected
-                          ? 'bg-emerald-500/15 text-white border border-emerald-500/40 font-semibold shadow-xs'
-                          : 'text-[#a1a1aa] hover:bg-[#1a1a1e] hover:text-[#ededed]'
-                      }`}
+                {filteredErrors.length === 0 ? (
+                  <div className="p-6 text-center space-y-3 font-mono">
+                    <div className="text-xs text-[#71717a]">未找到匹配 "{query}" 的错误代码</div>
+                    <a
+                      href={`https://github.com/citrusjunoss/whatsapp-media-checker/issues/new?template=new_error.yml&code=${encodeURIComponent(
+                        query
+                      )}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-colors"
                     >
-                      <div className="flex items-center space-x-2 truncate">
-                        <span className="font-mono font-bold text-emerald-400">
-                          #{item.code}
+                      <PlusCircle className="w-3.5 h-3.5" />
+                      <span>提交 Issue 贡献此错误</span>
+                      <ExternalLink className="w-3 h-3 ml-0.5" />
+                    </a>
+                  </div>
+                ) : (
+                  filteredErrors.map((item) => {
+                    const isSelected = selectedErrorCode === item.code;
+                    return (
+                      <div
+                        key={`${item.provider || 'meta'}_${item.code}`}
+                        ref={(el) => {
+                          itemRefs.current[item.code] = el;
+                        }}
+                        onClick={() => setSelectedErrorCode(item.code)}
+                        className={`px-3 py-2.5 rounded-lg text-xs cursor-pointer flex items-center justify-between transition-all ${
+                          isSelected
+                            ? 'bg-emerald-500/15 text-white border border-emerald-500/40 font-semibold shadow-xs'
+                            : 'text-[#a1a1aa] hover:bg-[#1a1a1e] hover:text-[#ededed]'
+                        }`}
+                      >
+                        <div className="flex items-center space-x-1.5 truncate">
+                          <span
+                            className={`text-[9px] font-mono px-1 py-0.2 rounded shrink-0 font-bold ${
+                              item.provider === 'aliyun'
+                                ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                                : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                            }`}
+                          >
+                            {item.provider === 'aliyun' ? '阿里' : 'META'}
+                          </span>
+                          <span className="font-mono font-bold text-emerald-400 shrink-0">
+                            #{item.code}
+                          </span>
+                          <span className="truncate">{item.titleZh}</span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#1f1f23] text-[#71717a] shrink-0 ml-1">
+                          {item.severity === 'blocker' ? 'BLOCK' : item.severity === 'rate_limit' ? 'RATE' : 'ERR'}
                         </span>
-                        <span className="truncate">{item.titleZh}</span>
                       </div>
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#1f1f23] text-[#71717a] shrink-0 ml-1">
-                        {item.severity === 'blocker' ? 'BLOCK' : item.severity === 'rate_limit' ? 'RATE' : 'ERR'}
-                      </span>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
             </div>
 
@@ -399,9 +446,18 @@ export const RaycastView: React.FC<RaycastViewProps> = ({
                 <>
                   <div className="flex flex-wrap items-start justify-between gap-2 pb-3 border-b border-[#27272a]">
                     <div className="space-y-1">
-                      <div className="flex items-center space-x-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="text-2xl font-mono font-black text-emerald-400">
                           #{selectedItem.code}
+                        </span>
+                        <span
+                          className={`text-[11px] font-mono px-2 py-0.5 rounded font-bold ${
+                            selectedItem.provider === 'aliyun'
+                              ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                              : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                          }`}
+                        >
+                          {selectedItem.providerNameZh || 'Meta 官方'}
                         </span>
                         <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#27272a] text-slate-300">
                           HTTP {selectedItem.httpStatus || 400}
@@ -424,7 +480,7 @@ export const RaycastView: React.FC<RaycastViewProps> = ({
                       rel="noreferrer"
                       className="text-xs font-mono text-emerald-400 hover:underline flex items-center space-x-1"
                     >
-                      <span>Meta Docs</span>
+                      <span>{selectedItem.provider === 'aliyun' ? '阿里云文档' : '官方文档'}</span>
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   </div>

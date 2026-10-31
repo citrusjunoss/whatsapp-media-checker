@@ -2,11 +2,33 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <script src="./coi-serviceworker.js"></script>
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WhatsApp 媒体检测与转换工具 | Pure Frontend Tool</title>
-    <meta name="description" content="纯前端 WhatsApp Business 媒体文件规格检测、转码压缩与 Meta Graph API 模板 Header 校验工具" />
+    <meta name="description" content="纯前端离线 WhatsApp Business 媒体文件规格检测、H.264 FastStart 视频转码与 Meta Graph API 错误字典速查" />
+
+    <!-- PWA & Mobile Meta Tags -->
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="theme-color" content="#059669" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="WA DevTools" />
+    <link rel="apple-touch-icon" href="./pwa-192x192.png" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+
+    <!-- Unified PWA & Cross-Origin Isolation Service Worker Bootstrapper -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('./sw.js', { scope: './' }).then(function(reg) {
+            if (!window.crossOriginIsolated && reg.active && !navigator.serviceWorker.controller) {
+              window.location.reload();
+            }
+          }).catch(function(err) {
+            console.warn('[PWA] SW registration failed:', err);
+          });
+        });
+      }
+    </script>
   </head>
   <body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
     <div id="root"></div>

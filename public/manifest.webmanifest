@@ -1,0 +1,50 @@
+{
+  "id": "whatsapp-media-checker",
+  "name": "WhatsApp 媒体检测与合规转换工具",
+  "short_name": "WA DevTools",
+  "description": "纯前端离线 WhatsApp Business 媒体文件检测、H.264 FastStart 视频修复与 Meta Graph API 错误排查字典",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0a0c",
+  "theme_color": "#059669",
+  "categories": ["developer", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "./pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "./pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "媒体合规检测",
+      "short_name": "媒体检测",
+      "url": "./#/media",
+      "description": "检测图片、音频、视频的 WhatsApp 合规性与自动化转码"
+    },
+    {
+      "name": "错误代码速查",
+      "short_name": "错误速查",
+      "url": "./#/errors",
+      "description": "搜索 Meta WhatsApp Graph API 官方 77 个错误码与排查指南"
+    }
+  ]
+}

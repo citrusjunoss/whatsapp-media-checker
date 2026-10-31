@@ -99,7 +99,7 @@ function MainApp() {
       {/* 4. Global Minimal Footer */}
       <footer className="border-t app-border py-3 app-surface-subtle text-xs font-mono app-text-dim text-center">
         <div className="max-w-[1440px] mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>WhatsApp DevTools · Client-side Only · Zero Server Storage</span>
+          <span>WhatsApp DevTools · Client-side Only · PWA Offline Ready</span>
           <span className="text-[11px]">Meta Graph API v26.0 Compliance Engine</span>
         </div>
       </footer>

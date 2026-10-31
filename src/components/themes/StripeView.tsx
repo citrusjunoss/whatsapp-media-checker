@@ -3,6 +3,7 @@ import {
   getLoadedErrorDataset,
   searchErrors,
   ERROR_CATEGORIES,
+  ERROR_PROVIDERS,
   WhatsAppErrorItem,
   ErrorSeverity,
 } from '../../core/errorEngine';
@@ -59,6 +60,7 @@ export const StripeView: React.FC<StripeViewProps> = ({
 
   const [query, setQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [providerFilter, setProviderFilter] = useState('all');
   const [severityFilter, setSeverityFilter] = useState<'all' | ErrorSeverity>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -66,7 +68,7 @@ export const StripeView: React.FC<StripeViewProps> = ({
   // Slide-over drawer state
   const [drawerItem, setDrawerItem] = useState<WhatsAppErrorItem | null>(null);
   const [copiedType, setCopiedType] = useState<string | null>(null);
-  const [checkedSteps, setCheckedSteps] = useState<Record<number, Record<number, boolean>>>({});
+  const [checkedSteps, setCheckedSteps] = useState<Record<string | number, Record<number, boolean>>>({});
 
   // Media state (Step-by-step Wizard)
   const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1);
@@ -78,12 +80,12 @@ export const StripeView: React.FC<StripeViewProps> = ({
 
   // Filtered dataset
   const filteredErrors = useMemo(() => {
-    let list = searchErrors(query, categoryFilter, dataset.items);
+    let list = searchErrors(query, categoryFilter, dataset.items, providerFilter);
     if (severityFilter !== 'all') {
       list = list.filter((i) => i.severity === severityFilter);
     }
     return list;
-  }, [query, categoryFilter, severityFilter, dataset.items]);
+  }, [query, categoryFilter, severityFilter, providerFilter, dataset.items]);
 
   // Pagination
   const totalPages = Math.ceil(filteredErrors.length / pageSize) || 1;
@@ -314,6 +316,22 @@ export const StripeView: React.FC<StripeViewProps> = ({
                   ))}
                 </select>
 
+                {/* Provider select */}
+                <select
+                  value={providerFilter}
+                  onChange={(e) => {
+                    setProviderFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="px-3 py-2 text-xs rounded-md border border-[#cbd5e1] bg-white text-[#334155] focus:outline-none focus:border-[#635bff]"
+                >
+                  {ERROR_PROVIDERS.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.nameZh}
+                    </option>
+                  ))}
+                </select>
+
                 {/* Severity select */}
                 <select
                   value={severityFilter}
@@ -346,14 +364,45 @@ export const StripeView: React.FC<StripeViewProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#e2e8f0]">
-                  {paginatedErrors.map((item) => (
+                  {paginatedErrors.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-12 text-center text-xs text-[#64748b]">
+                        <div className="space-y-3">
+                          <div>未找到与 "{query}" 匹配的错误代码</div>
+                          <a
+                            href={`https://github.com/citrusjunoss/whatsapp-media-checker/issues/new?template=new_error.yml&code=${encodeURIComponent(
+                              query
+                            )}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-[#635bff] text-white font-medium hover:bg-[#5349e0] transition-colors"
+                          >
+                            <span>提交 Issue 贡献该错误</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    paginatedErrors.map((item) => (
                     <tr
                       key={item.code}
                       onClick={() => setDrawerItem(item)}
                       className="hover:bg-[#f8fafc] transition-colors cursor-pointer group"
                     >
                       <td className="py-3 px-4 font-mono font-bold text-[#635bff]">
-                        #{item.code}
+                        <div className="flex items-center space-x-1.5">
+                          <span
+                            className={`text-[9px] px-1 py-0.2 rounded font-bold ${
+                              item.provider === 'aliyun'
+                                ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                                : 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                            }`}
+                          >
+                            {item.provider === 'aliyun' ? '阿里' : 'Meta'}
+                          </span>
+                          <span>#{item.code}</span>
+                        </div>
                       </td>
                       <td className="py-3 px-4">
                         <div className="font-semibold text-[#0f172a]">{item.titleZh}</div>
@@ -393,7 +442,7 @@ export const StripeView: React.FC<StripeViewProps> = ({
                         </button>
                       </td>
                     </tr>
-                  ))}
+                  ))) }
                 </tbody>
               </table>
 
@@ -590,6 +639,15 @@ export const StripeView: React.FC<StripeViewProps> = ({
                 </span>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-200 text-slate-700">
                   HTTP {drawerItem.httpStatus || 400}
+                </span>
+                <span
+                  className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
+                    drawerItem.provider === 'aliyun'
+                      ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                      : 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                  }`}
+                >
+                  {drawerItem.providerNameZh || 'Meta 官方'}
                 </span>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#635bff]/10 text-[#635bff]">
                   {drawerItem.categoryNameZh}
