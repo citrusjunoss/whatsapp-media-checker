@@ -13,6 +13,7 @@ import {
   CheckMode,
 } from '../../core/validator';
 import { ConverterPanel } from '../ConverterPanel';
+import { DropZone } from '../DropZone';
 import {
   Search,
   X,
@@ -42,14 +43,20 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../../core/themeContext';
 
-export const StripeView: React.FC<{
+interface StripeViewProps {
+  activeNav: 'file_tools' | 'error_lookup';
+  onNavChange: (nav: 'file_tools' | 'error_lookup') => void;
   onOpenRules: () => void;
-}> = ({ onOpenRules }) => {
+}
+
+export const StripeView: React.FC<StripeViewProps> = ({
+  activeNav,
+  onNavChange,
+  onOpenRules,
+}) => {
   const { setTheme } = useTheme();
   const dataset = useMemo(() => getLoadedErrorDataset(), []);
 
-  // Navigation: 'errors' | 'media'
-  const [activeSection, setActiveSection] = useState<'errors' | 'media'>('errors');
   const [query, setQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [severityFilter, setSeverityFilter] = useState<'all' | ErrorSeverity>('all');
@@ -138,11 +145,11 @@ export const StripeView: React.FC<{
 
             <button
               onClick={() => {
-                setActiveSection('errors');
+                onNavChange('error_lookup');
                 setDrawerItem(null);
               }}
               className={`w-full flex items-center justify-between px-2.5 py-2 rounded-md text-xs font-medium transition-colors ${
-                activeSection === 'errors'
+                activeNav === 'error_lookup'
                   ? 'bg-[#635bff]/10 text-[#635bff] font-semibold'
                   : 'text-[#475569] hover:bg-[#f1f5f9]'
               }`}
@@ -158,11 +165,11 @@ export const StripeView: React.FC<{
 
             <button
               onClick={() => {
-                setActiveSection('media');
+                onNavChange('file_tools');
                 setDrawerItem(null);
               }}
               className={`w-full flex items-center justify-between px-2.5 py-2 rounded-md text-xs font-medium transition-colors ${
-                activeSection === 'media'
+                activeNav === 'file_tools'
                   ? 'bg-[#635bff]/10 text-[#635bff] font-semibold'
                   : 'text-[#475569] hover:bg-[#f1f5f9]'
               }`}
@@ -215,7 +222,7 @@ export const StripeView: React.FC<{
           <div className="flex items-center space-x-2 text-xs text-[#64748b]">
             <span className="font-medium text-[#0f172a]">WhatsApp DevTools</span>
             <span>/</span>
-            <span>{activeSection === 'errors' ? 'API Error Directory' : 'Media Inspector Wizard'}</span>
+            <span>{activeNav === 'error_lookup' ? 'API Error Directory' : 'Media Inspector Wizard'}</span>
           </div>
 
           <div className="flex items-center space-x-3 text-xs">
@@ -226,7 +233,7 @@ export const StripeView: React.FC<{
         </header>
 
         {/* Section 1: Error Directory (Enterprise Table + Slide-over Drawer) */}
-        {activeSection === 'errors' ? (
+        {activeNav === 'error_lookup' ? (
           <div className="p-6 space-y-6">
             {/* KPI Metric Strip */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
@@ -449,54 +456,31 @@ export const StripeView: React.FC<{
               ))}
             </div>
 
-            {/* Wizard Step 1: Upload */}
+            {/* Wizard Step 1: Upload & Remote URL */}
             {wizardStep === 1 && (
-              <div className="bg-white p-8 rounded-lg border border-[#e2e8f0] text-center space-y-4">
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-[#cbd5e1] hover:border-[#635bff] rounded-xl p-12 cursor-pointer transition-colors"
-                >
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) handleInspectFile(f);
-                    }}
-                  />
-                  <Upload className="w-10 h-10 text-[#635bff] mx-auto mb-3" />
-                  <div className="text-sm font-semibold text-[#0f172a]">
-                    拖拽或点击上传需要核验的媒体文件
-                  </div>
-                  <div className="text-xs text-[#64748b] mt-1">
-                    支持 JPEG, PNG, WebP, MP4, MP3, PDF 文件
+              <div className="bg-white p-6 rounded-lg border border-[#e2e8f0] space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[#e2e8f0] text-xs">
+                  <span className="font-semibold text-[#0f172a]">
+                    选择媒体导入源（支持本地文件投递与远程 CDN 直链探测）
+                  </span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[#64748b]">校验模式:</span>
+                    <button
+                      onClick={() => setCheckMode(checkMode === 'standard' ? 'template_header' : 'standard')}
+                      className="px-2.5 py-1 rounded border border-[#cbd5e1] font-mono text-xs text-[#0f172a]"
+                    >
+                      {checkMode === 'standard' ? '标准消息接口' : '模板 Header 接口'}
+                    </button>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-center space-x-3 text-xs">
-                  <span className="text-[#64748b]">校验模式:</span>
-                  <button
-                    onClick={() => setCheckMode('standard')}
-                    className={`px-3 py-1.5 rounded border text-xs font-medium ${
-                      checkMode === 'standard'
-                        ? 'bg-[#635bff] text-white border-[#635bff]'
-                        : 'bg-white text-[#475569] border-[#cbd5e1]'
-                    }`}
-                  >
-                    标准消息媒体接口
-                  </button>
-                  <button
-                    onClick={() => setCheckMode('template_header')}
-                    className={`px-3 py-1.5 rounded border text-xs font-medium ${
-                      checkMode === 'template_header'
-                        ? 'bg-[#635bff] text-white border-[#635bff]'
-                        : 'bg-white text-[#475569] border-[#cbd5e1]'
-                    }`}
-                  >
-                    模板 Header 上传模式
-                  </button>
-                </div>
+                <DropZone
+                  mode={checkMode}
+                  onFilesSelected={(files) => {
+                    if (files[0]) handleInspectFile(files[0]);
+                  }}
+                  isProcessing={isProcessing}
+                />
               </div>
             )}
 

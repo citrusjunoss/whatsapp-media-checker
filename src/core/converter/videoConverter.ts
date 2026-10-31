@@ -2,9 +2,11 @@ import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
 export interface VideoConversionOptions {
+  profile?: 'main' | 'baseline';
+  durationSeconds?: number;
   enableFastStart?: boolean;
   compressTo16MB?: boolean;
-  targetMaxBytes?: number; // default 15.5MB
+  targetMaxBytes?: number; // default 15.0MB to strictly guarantee <= 16MB
   onProgress?: (progressPercent: number, stageMessage: string) => void;
   onLog?: (message: string) => void;
 }
@@ -32,7 +34,7 @@ export async function getFFmpeg(
 
   onProgress?.(5, '正在初始化 FFmpeg WebAssembly 内核...');
 
-  // Use unpkg CDN for core-mt (multi-thread) or single-thread
+  // Use unpkg CDN for core
   const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
 
   try {
@@ -55,9 +57,11 @@ export async function convertVideo(
   options: VideoConversionOptions = {}
 ): Promise<ConvertedVideoResult> {
   const {
+    profile = 'main',
+    durationSeconds,
     enableFastStart = true,
     compressTo16MB = true,
-    targetMaxBytes = 15.5 * 1024 * 1024,
+    targetMaxBytes = 15.0 * 1024 * 1024, // 15.0 MB safe threshold (strictly <= 16MB)
     onProgress,
     onLog,
   } = options;
@@ -77,47 +81,126 @@ export async function convertVideo(
   ffmpeg.on('progress', ({ progress }) => {
     // progress is 0.0 to 1.0
     const pct = Math.min(95, 30 + Math.round(progress * 65));
-    onProgress?.(pct, `正在转码视频... ${Math.round(progress * 100)}%`);
+    onProgress?.(pct, `正在转码视频 (H.264 ${profile.toUpperCase()} 无 B-frames)... ${Math.round(progress * 100)}%`);
   });
+
+  // Calculate bitrate based on duration to strictly guarantee <= 16MB
+  const fileSize = file.size || (file as any).size || 0;
+  const isLarge = fileSize > targetMaxBytes;
+  const effectiveDuration = durationSeconds && durationSeconds > 0 ? durationSeconds : (isLarge ? 90 : 45);
+
+  const totalBits = targetMaxBytes * 8;
+  const totalBps = totalBits / Math.max(effectiveDuration, 3);
+  const audioBps = 128 * 1000;
+  let targetVideoKbps = Math.floor((totalBps - audioBps) / 1000);
+
+  // Reasonable bounds
+  if (targetVideoKbps < 150) targetVideoKbps = 150;
+  if (targetVideoKbps > 2500) targetVideoKbps = 2500;
 
   // Construct FFmpeg command arguments
   const args = ['-i', inputName];
 
-  // Video codec: H.264 Baseline profile for maximum WhatsApp compatibility
-  args.push('-c:v', 'libx264', '-profile:v', 'baseline', '-level', '3.0', '-preset', 'ultrafast');
+  // Video codec: H.264 Main (recommended by Meta) or Baseline, strictly WITHOUT B-frames (-bf 0)
+  args.push('-c:v', 'libx264', '-profile:v', profile, '-bf', '0', '-preset', 'ultrafast');
 
-  // Video compression parameters
-  if (compressTo16MB && (file.size > targetMaxBytes || (file as any).size > targetMaxBytes)) {
-    // If oversized, downscale resolution to max 1280x720 and use higher CRF
-    args.push('-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2,scale=min(1280\\,iw):-2', '-crf', '28');
+  // Video resolution scaling and bitrate control to strictly constrain size <= 16MB
+  if (isLarge || (durationSeconds && durationSeconds > 60)) {
+    // Large or longer videos: scale down to max 1280x720 or 960x540
+    const maxDim = durationSeconds && durationSeconds > 120 ? '854' : '1280';
+    args.push(
+      '-vf',
+      `scale=trunc(iw/2)*2:trunc(ih/2)*2,scale=min(${maxDim}\\,iw):-2`,
+      '-b:v',
+      `${targetVideoKbps}k`,
+      '-maxrate',
+      `${Math.round(targetVideoKbps * 1.15)}k`,
+      '-bufsize',
+      `${Math.round(targetVideoKbps * 2)}k`
+    );
   } else {
-    // Normal quality, ensure even dimensions
-    args.push('-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2', '-crf', '23');
+    args.push(
+      '-vf',
+      'scale=trunc(iw/2)*2:trunc(ih/2)*2,scale=min(1280\\,iw):-2',
+      '-b:v',
+      `${targetVideoKbps}k`,
+      '-maxrate',
+      `${Math.round(targetVideoKbps * 1.2)}k`,
+      '-bufsize',
+      `${Math.round(targetVideoKbps * 2)}k`
+    );
   }
 
   // Audio codec: AAC, 128k, stereo or mono
   args.push('-c:a', 'aac', '-b:a', '128k', '-ac', '2');
 
-  // FastStart: move moov atom to the beginning of the file
+  // FastStart: move moov atom before mdat for WhatsApp streaming & preview
   if (enableFastStart) {
     args.push('-movflags', '+faststart');
+  }
+
+  // Hard cap file size at 15.8MB (15800000 bytes) so it can never exceed 16MB
+  if (compressTo16MB) {
+    args.push('-fs', '15800000');
   }
 
   args.push('-y', outputName);
 
   const commandStr = `ffmpeg ${args.join(' ')}`;
-  onProgress?.(30, '开始执行转码...');
+  onProgress?.(30, '开始执行转码 (注入 FastStart 并强制 ≤16MB)...');
 
   await ffmpeg.exec(args);
 
   onProgress?.(96, '正在读取并封装转码后的 MP4 文件...');
-  const data = await ffmpeg.readFile(outputName);
-  const rawBytes = typeof data === 'string' ? new TextEncoder().encode(data) : data;
+  let data = await ffmpeg.readFile(outputName);
+  let rawBytes = typeof data === 'string' ? new TextEncoder().encode(data) : data;
+
+  // Secondary Fallback Guard: If output STILL exceeds 16MB (e.g. extreme bitrate overshoot)
+  if (rawBytes.byteLength > 16 * 1024 * 1024) {
+    onProgress?.(70, '视频仍超出 16MB，正在执行二次深度紧缩转码...');
+    const fallbackArgs = [
+      '-i',
+      outputName,
+      '-c:v',
+      'libx264',
+      '-profile:v',
+      profile,
+      '-bf',
+      '0',
+      '-preset',
+      'ultrafast',
+      '-vf',
+      'scale=min(854\\,iw):-2',
+      '-b:v',
+      '600k',
+      '-maxrate',
+      '700k',
+      '-bufsize',
+      '1200k',
+      '-c:a',
+      'aac',
+      '-b:a',
+      '96k',
+      '-movflags',
+      '+faststart',
+      '-fs',
+      '15500000',
+      '-y',
+      'fallback_output.mp4',
+    ];
+    await ffmpeg.exec(fallbackArgs);
+    data = await ffmpeg.readFile('fallback_output.mp4');
+    rawBytes = typeof data === 'string' ? new TextEncoder().encode(data) : data;
+    try {
+      await ffmpeg.deleteFile('fallback_output.mp4');
+    } catch {}
+  }
+
   const copyBuffer = new ArrayBuffer(rawBytes.byteLength);
   new Uint8Array(copyBuffer).set(rawBytes);
   const blob = new Blob([copyBuffer], { type: 'video/mp4' });
 
-  // Clean up memory in virtual fs
+  // Clean up virtual fs
   try {
     await ffmpeg.deleteFile(inputName);
     await ffmpeg.deleteFile(outputName);
@@ -128,7 +211,7 @@ export async function convertVideo(
   const originalName = (file as File).name ? (file as File).name.replace(/\.[^/.]+$/, '') : 'video';
   const fileName = `${originalName}_whatsapp.mp4`;
 
-  onProgress?.(100, '视频转码完成！');
+  onProgress?.(100, '视频转码完成！体积严格控制在 16MB 以内。');
 
   return {
     blob,
@@ -140,6 +223,7 @@ export async function convertVideo(
 }
 
 export function getRecommendedFFmpegCommand(fileName: string, isOversized = false): string {
-  const crf = isOversized ? 28 : 23;
-  return `ffmpeg -i "${fileName}" -c:v libx264 -profile:v baseline -level 3.0 -preset medium -crf ${crf} -vf "scale=min(1280\\,iw):-2:flags=lanczos" -c:a aac -b:a 128k -ac 2 -movflags +faststart output.mp4`;
+  const bitrate = isOversized ? '1200k' : '1800k';
+  const maxrate = isOversized ? '1400k' : '2200k';
+  return `ffmpeg -i "${fileName}" -c:v libx264 -profile:v main -bf 0 -preset medium -b:v ${bitrate} -maxrate ${maxrate} -bufsize 3000k -vf "scale=min(1280\\,iw):-2:flags=lanczos" -c:a aac -b:a 128k -ac 2 -movflags +faststart -fs 16000000 output.mp4`;
 }

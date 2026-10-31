@@ -170,35 +170,78 @@ export const InspectionResult: React.FC<InspectionResultProps> = ({
       {/* Key Diagnostic Metrics Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 border-b app-border divide-x app-border text-xs font-mono">
         <div className="p-2.5 app-surface-subtle">
-          <div className="text-[10px] uppercase app-text-dim">MIME 类型 (Sniffed)</div>
+          <div className="text-[10px] uppercase app-text-dim">
+            {result.detectedCategory === 'video' ? 'H.264 Profile 规格' : 'MIME 类型 (Sniffed)'}
+          </div>
           <div className="font-semibold app-text-main truncate mt-0.5" title={result.detectedMime}>
-            {result.detectedMime || 'unknown'}
+            {result.detectedCategory === 'video' ? (
+              <span className="flex items-center space-x-1">
+                <span>{result.metadata?.video?.h264Profile ? `H.264 ${result.metadata.video.h264Profile}` : 'H.264 (AVC1)'}</span>
+                {result.metadata?.video?.h264Profile === 'Main' && (
+                  <span className="text-[10px] text-emerald-500 font-normal">[推荐]</span>
+                )}
+                {result.metadata?.video?.h264Profile === 'High' && (
+                  <span className="text-[10px] text-amber-500 font-normal">[需注意]</span>
+                )}
+              </span>
+            ) : (
+              result.detectedMime || 'unknown'
+            )}
           </div>
         </div>
 
         <div className="p-2.5 app-surface-subtle">
           <div className="text-[10px] uppercase app-text-dim">文件体积 (Size)</div>
-          <div className="font-semibold app-text-main mt-0.5">
-            {formatBytes(result.fileSize)}
+          <div className="font-semibold app-text-main mt-0.5 flex items-center space-x-1.5">
+            <span>{formatBytes(result.fileSize)}</span>
+            {result.detectedCategory === 'video' && (
+              <span
+                className={`text-[10px] px-1 py-0.2 rounded font-bold ${
+                  result.fileSize <= 16 * 1024 * 1024
+                    ? 'text-emerald-500 bg-emerald-500/10'
+                    : 'text-rose-500 bg-rose-500/10'
+                }`}
+              >
+                {result.fileSize <= 16 * 1024 * 1024 ? '≤ 16MB' : '> 16MB 超标'}
+              </span>
+            )}
           </div>
         </div>
 
         <div className="p-2.5 app-surface-subtle">
-          <div className="text-[10px] uppercase app-text-dim">分辨率 / 尺寸</div>
+          <div className="text-[10px] uppercase app-text-dim">
+            {result.detectedCategory === 'video' ? 'B-frames (双向预测)' : '分辨率 / 尺寸'}
+          </div>
           <div className="font-semibold app-text-main mt-0.5">
-            {result.metadata?.width && result.metadata?.height
-              ? `${result.metadata.width} × ${result.metadata.height}`
-              : 'N/A'}
+            {result.detectedCategory === 'video' ? (
+              result.metadata?.video?.hasBframes === true ? (
+                <span className="text-amber-500 font-bold flex items-center space-x-1">
+                  <span>包含 B-frames</span>
+                  <span className="text-[10px] font-normal text-amber-400/80">(建议移除)</span>
+                </span>
+              ) : result.metadata?.video?.hasBframes === false ? (
+                <span className="text-emerald-500 font-bold flex items-center space-x-1">
+                  <span>无 B-frames</span>
+                  <span className="text-[10px] font-normal text-emerald-400/80">(官方推荐)</span>
+                </span>
+              ) : (
+                '未检测到'
+              )
+            ) : result.metadata?.width && result.metadata?.height ? (
+              `${result.metadata.width} × ${result.metadata.height}`
+            ) : (
+              'N/A'
+            )}
           </div>
         </div>
 
         <div className="p-2.5 app-surface-subtle">
           <div className="text-[10px] uppercase app-text-dim">视频 / 音频结构</div>
           <div className="font-semibold app-text-main mt-0.5 truncate">
-            {result.metadata?.hasFastStart
-              ? 'FastStart: YES'
-              : result.detectedCategory === 'video'
-              ? 'FastStart: NO'
+            {result.detectedCategory === 'video'
+              ? `${result.metadata?.hasFastStart ? 'FastStart: YES' : 'FastStart: NO'}${
+                  result.metadata?.duration ? ` · ${result.metadata.duration.toFixed(1)}s` : ''
+                }`
               : result.metadata?.duration
               ? `${result.metadata.duration.toFixed(1)}s`
               : 'NORMAL'}

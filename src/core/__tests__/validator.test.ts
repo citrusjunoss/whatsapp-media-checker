@@ -90,4 +90,60 @@ describe('WhatsApp Media Checker Core Validation', () => {
     expect(stdSnippets.standardUploadCurl).toContain('POST "https://graph.facebook.com/v26.0/9988776655/media"');
     expect(stdSnippets.sendMessageCurl).toContain('POST "https://graph.facebook.com/v26.0/9988776655/messages"');
   });
+
+  it('should recommend official Meta video parameters: H.264 Main, no B-frames, FastStart, <= 16MB', async () => {
+    const { getRecommendedFFmpegCommand } = await import('../converter/videoConverter');
+    const cmd = getRecommendedFFmpegCommand('promo.mp4', true);
+
+    expect(cmd).toContain('-profile:v main');
+    expect(cmd).toContain('-bf 0');
+    expect(cmd).toContain('-movflags +faststart');
+    expect(cmd).toContain('-fs 16000000');
+    expect(cmd).toContain('-c:a aac');
+  });
+
+  it('should accurately inspect Non-FastStart MP4 with moov at end of file', async () => {
+    const fs = await import('fs');
+    const { inspectMp4 } = await import('../mp4Inspector');
+
+    if (fs.existsSync('/tmp/mp4test/sample_moov_at_end.mp4')) {
+      const buffer = fs.readFileSync('/tmp/mp4test/sample_moov_at_end.mp4');
+      const file = new File([buffer], 'sample_non_faststart.mp4', { type: 'video/mp4' });
+
+      const res = await inspectMp4(file);
+      expect(res.isMp4).toBe(true);
+      expect(res.hasFastStart).toBe(false); // moov is at the end, so hasFastStart is false
+      expect(res.videoCodec).toBe('avc1'); // H.264 video codec accurately extracted
+      expect(res.h264Profile).toBe('Baseline'); // H.264 profile accurately extracted
+      expect(res.audioCodec).toBe('mp4a'); // AAC audio codec accurately extracted
+    }
+  });
+
+  it('should validate Template Header image aspect ratios: 3:2, 1:1, 2:3', async () => {
+    const { evaluateHeaderImageAspectRatio } = await import('../validator');
+
+    // 1. 横版 3:2 (e.g. 1200x800)
+    const landscapeCheck = evaluateHeaderImageAspectRatio(1200, 800);
+    expect(landscapeCheck.pass).toBe(true);
+    expect(landscapeCheck.matchedName).toBe('横版 3:2');
+
+    // 2. 方形 1:1 (e.g. 1000x1000)
+    const squareCheck = evaluateHeaderImageAspectRatio(1000, 1000);
+    expect(squareCheck.pass).toBe(true);
+    expect(squareCheck.matchedName).toBe('方形 1:1');
+
+    // 3. 竖版 2:3 (e.g. 800x1200)
+    const portraitCheck = evaluateHeaderImageAspectRatio(800, 1200);
+    expect(portraitCheck.pass).toBe(true);
+    expect(portraitCheck.matchedName).toBe('竖版 2:3');
+
+    // 4. 不合规比例 (e.g. 16:9 / 1920x1080, 4:3 / 1024x768)
+    const invalidCheck169 = evaluateHeaderImageAspectRatio(1920, 1080);
+    expect(invalidCheck169.pass).toBe(false);
+    expect(invalidCheck169.matchedName).toBe(null);
+
+    const invalidCheck43 = evaluateHeaderImageAspectRatio(1024, 768);
+    expect(invalidCheck43.pass).toBe(false);
+    expect(invalidCheck43.matchedName).toBe(null);
+  });
 });

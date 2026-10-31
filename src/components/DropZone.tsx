@@ -184,7 +184,7 @@ export const DropZone: React.FC<DropZoneProps> = ({ mode, onFilesSelected, isPro
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => inputRef.current?.click()}
-          className={`border-2 border-dashed rounded-lg p-6 transition-all cursor-pointer text-center ${
+          className={`border-2 border-dashed rounded-lg p-4 sm:p-5 transition-all cursor-pointer text-center ${
             isDragOver
               ? 'border-emerald-500 app-surface-subtle'
               : 'app-border app-surface hover:app-surface-subtle'

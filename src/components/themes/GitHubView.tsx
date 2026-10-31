@@ -36,15 +36,23 @@ import {
   Bookmark,
 } from 'lucide-react';
 import { useTheme } from '../../core/themeContext';
+import { DropZone } from '../DropZone';
+import { ConverterPanel } from '../ConverterPanel';
 
-export const GitHubView: React.FC<{
+interface GitHubViewProps {
+  activeNav: 'file_tools' | 'error_lookup';
+  onNavChange: (nav: 'file_tools' | 'error_lookup') => void;
   onOpenRules: () => void;
-}> = ({ onOpenRules }) => {
+}
+
+export const GitHubView: React.FC<GitHubViewProps> = ({
+  activeNav,
+  onNavChange,
+  onOpenRules,
+}) => {
   const { setTheme } = useTheme();
   const dataset = useMemo(() => getLoadedErrorDataset(), []);
 
-  // GitHub Tab: 'code' (Media Validator) | 'issues' (API Errors)
-  const [activeTab, setActiveTab] = useState<'issues' | 'code'>('issues');
   const [query, setQuery] = useState('');
   const [labelFilter, setLabelFilter] = useState<'all' | 'blocker' | 'rate_limit' | 'template' | 'auth'>('all');
 
@@ -109,21 +117,33 @@ export const GitHubView: React.FC<{
           </div>
 
           <div className="flex items-center space-x-2 text-xs font-medium">
-            <div className="flex items-center border border-[#30363d] rounded-md bg-[#21262d] divide-x divide-[#30363d]">
-              <span className="px-2.5 py-1 text-slate-300 flex items-center space-x-1">
+            <a
+              href="https://github.com/citrusjunoss/whatsapp-media-checker"
+              target="_blank"
+              rel="noreferrer"
+              title="在 GitHub 上给 whatsapp-media-checker 点赞 Star"
+              className="flex items-center border border-[#30363d] rounded-md bg-[#21262d] hover:bg-[#30363d] hover:border-[#8b949e] divide-x divide-[#30363d] transition-all cursor-pointer"
+            >
+              <span className="px-2.5 py-1 text-slate-200 flex items-center space-x-1">
                 <Star className="w-3.5 h-3.5 text-amber-400" />
                 <span>Star</span>
               </span>
               <span className="px-2 py-1 font-mono text-[#8b949e]">12</span>
-            </div>
+            </a>
 
-            <div className="flex items-center border border-[#30363d] rounded-md bg-[#21262d] divide-x divide-[#30363d]">
-              <span className="px-2.5 py-1 text-slate-300 flex items-center space-x-1">
+            <a
+              href="https://github.com/citrusjunoss/whatsapp-media-checker/fork"
+              target="_blank"
+              rel="noreferrer"
+              title="在 GitHub 上 Fork 此项目"
+              className="flex items-center border border-[#30363d] rounded-md bg-[#21262d] hover:bg-[#30363d] hover:border-[#8b949e] divide-x divide-[#30363d] transition-all cursor-pointer"
+            >
+              <span className="px-2.5 py-1 text-slate-200 flex items-center space-x-1">
                 <GitFork className="w-3.5 h-3.5 text-[#8b949e]" />
                 <span>Fork</span>
               </span>
               <span className="px-2 py-1 font-mono text-[#8b949e]">3</span>
-            </div>
+            </a>
 
             {/* Theme switcher */}
             <div className="border-l border-[#30363d] pl-2 flex items-center space-x-1">
@@ -147,11 +167,11 @@ export const GitHubView: React.FC<{
         <div className="flex items-center space-x-4 border-b border-transparent -mb-4 pt-1 text-xs">
           <button
             onClick={() => {
-              setActiveTab('issues');
+              onNavChange('error_lookup');
               setSelectedIssue(null);
             }}
             className={`pb-3 flex items-center space-x-2 border-b-2 font-medium transition-colors ${
-              activeTab === 'issues'
+              activeNav === 'error_lookup'
                 ? 'border-[#f78166] text-white font-semibold'
                 : 'border-transparent text-[#8b949e] hover:text-white'
             }`}
@@ -165,11 +185,11 @@ export const GitHubView: React.FC<{
 
           <button
             onClick={() => {
-              setActiveTab('code');
+              onNavChange('file_tools');
               setSelectedIssue(null);
             }}
             className={`pb-3 flex items-center space-x-2 border-b-2 font-medium transition-colors ${
-              activeTab === 'code'
+              activeNav === 'file_tools'
                 ? 'border-[#f78166] text-white font-semibold'
                 : 'border-transparent text-[#8b949e] hover:text-white'
             }`}
@@ -189,7 +209,7 @@ export const GitHubView: React.FC<{
       </div>
 
       {/* 2. GitHub Tab: Issues Tracker */}
-      {activeTab === 'issues' && (
+      {activeNav === 'error_lookup' && (
         <div className="p-5 space-y-4">
           {!selectedIssue ? (
             /* Issues List View */
@@ -432,7 +452,7 @@ export const GitHubView: React.FC<{
       )}
 
       {/* 3. GitHub Tab: Code & PR Diff View for Media */}
-      {activeTab === 'code' && (
+      {activeNav === 'file_tools' && (
         <div className="p-5 space-y-4">
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center space-x-2 font-mono text-[#8b949e]">
@@ -453,62 +473,62 @@ export const GitHubView: React.FC<{
             </div>
           </div>
 
-          {/* Upload Zone */}
-          <div
-            onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-[#30363d] hover:border-[#58a6ff] rounded-lg p-6 text-center cursor-pointer transition-colors bg-[#161b22]/50"
-          >
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) handleInspectMedia(f);
+          {/* Media Input DropZone (Supports Local Drag + Remote URL) */}
+          <div className="border border-[#30363d] rounded-lg p-3 bg-[#161b22]/70">
+            <DropZone
+              mode={checkMode}
+              onFilesSelected={(files) => {
+                if (files[0]) handleInspectMedia(files[0]);
               }}
+              isProcessing={false}
             />
-            <Upload className="w-8 h-8 text-[#58a6ff] mx-auto mb-2" />
-            <div className="text-xs font-mono text-white">
-              点击上传或拖入媒体文件 (JPG, PNG, WebP, MP4, MP3, PDF)
-            </div>
           </div>
 
-          {/* GitHub PR Diff Table */}
+          {/* GitHub PR Diff Table & Transcode Panel */}
           {mediaResult && (
-            <div className="border border-[#30363d] rounded-md overflow-hidden bg-[#0d1117] font-mono text-xs">
-              <div className="p-2.5 bg-[#161b22] border-b border-[#30363d] flex items-center justify-between">
-                <span className="font-bold text-white">
-                  diff --git a/{mediaResult.fileName} b/whatsapp_compliance_spec
-                </span>
-                <span
-                  className={`px-2 py-0.5 rounded text-[11px] font-bold ${
-                    mediaResult.overallStatus === 'pass'
-                      ? 'bg-[#238636] text-white'
-                      : 'bg-[#da3633] text-white'
-                  }`}
-                >
-                  {mediaResult.overallStatus === 'pass' ? 'PASSED 6/6 RULES' : 'DIFF CONFLICTS DETECTED'}
-                </span>
+            <>
+              <div className="border border-[#30363d] rounded-md overflow-hidden bg-[#0d1117] font-mono text-xs">
+                <div className="p-2.5 bg-[#161b22] border-b border-[#30363d] flex items-center justify-between">
+                  <span className="font-bold text-white">
+                    diff --git a/{mediaResult.fileName} b/whatsapp_compliance_spec
+                  </span>
+                  <span
+                    className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                      mediaResult.overallStatus === 'pass'
+                        ? 'bg-[#238636] text-white'
+                        : 'bg-[#da3633] text-white'
+                    }`}
+                  >
+                    {mediaResult.overallStatus === 'pass' ? 'PASSED 6/6 RULES' : 'DIFF CONFLICTS DETECTED'}
+                  </span>
+                </div>
+
+                <div className="p-4 space-y-2">
+                  {mediaResult.items.map((item, idx) => (
+                    <div key={idx} className="space-y-0.5">
+                      <div className="text-[11px] text-[#8b949e] font-semibold">
+                        @@ -{idx + 1},1 +{idx + 1},1 @@ {item.name}
+                      </div>
+                      {item.status !== 'pass' && (
+                        <div className="p-1.5 bg-[#f85149]/10 text-[#ff7b72] rounded">
+                          - Actual: {item.actual} ({item.message})
+                        </div>
+                      )}
+                      <div className="p-1.5 bg-[#2ea043]/10 text-[#7ee787] rounded">
+                        + Target Spec: {item.expected}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <div className="p-4 space-y-2">
-                {mediaResult.items.map((item, idx) => (
-                  <div key={idx} className="space-y-0.5">
-                    <div className="text-[11px] text-[#8b949e] font-semibold">
-                      @@ -{idx + 1},1 +{idx + 1},1 @@ {item.name}
-                    </div>
-                    {item.status !== 'pass' && (
-                      <div className="p-1.5 bg-[#f85149]/10 text-[#ff7b72] rounded">
-                        - Actual: {item.actual} ({item.message})
-                      </div>
-                    )}
-                    <div className="p-1.5 bg-[#2ea043]/10 text-[#7ee787] rounded">
-                      + Target Spec: {item.expected}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+              {/* GitHub Repair & Transcode Panel */}
+              {mediaFile && (
+                <div className="pt-2">
+                  <ConverterPanel activeResult={mediaResult} file={mediaFile} />
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

@@ -1,8 +1,16 @@
 /**
- * Pure frontend Image Converter & Smart Compressor
+ * Pure frontend Image Converter, Cropper & Smart Compressor
  * Supports converting any browser-loadable image to standard JPEG or PNG,
- * and auto-compressing down to <= 5MB.
+ * cropping to target aspect ratio (3:2, 1:1, 2:3, or custom),
+ * and auto-compressing down to <= 5MB (Meta WhatsApp compliance).
  */
+
+export interface ImageCropRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 export interface ImageConversionOptions {
   format: 'image/jpeg' | 'image/png';
@@ -10,6 +18,7 @@ export interface ImageConversionOptions {
   maxWidth?: number;
   maxHeight?: number;
   targetMaxBytes?: number; // default 5MB
+  crop?: ImageCropRect; // Optional crop in source image pixel coordinates
 }
 
 export interface ConvertedImageResult {
@@ -32,12 +41,23 @@ export async function convertAndCompressImage(
     maxWidth = 2560,
     maxHeight = 2560,
     targetMaxBytes = 5 * 1024 * 1024, // 5MB
+    crop,
   } = options;
 
   const img = await loadImage(file);
-  let { width, height } = img;
+  const natW = img.naturalWidth || img.width;
+  const natH = img.naturalHeight || img.height;
 
-  // Scale down if exceeds max dimensions
+  // Determine source crop bounds
+  const srcX = crop ? Math.max(0, Math.min(natW, crop.x)) : 0;
+  const srcY = crop ? Math.max(0, Math.min(natH, crop.y)) : 0;
+  const srcW = crop ? Math.max(1, Math.min(natW - srcX, crop.width)) : natW;
+  const srcH = crop ? Math.max(1, Math.min(natH - srcY, crop.height)) : natH;
+
+  let width = srcW;
+  let height = srcH;
+
+  // Scale down if cropped region exceeds max dimensions
   if (width > maxWidth || height > maxHeight) {
     const ratio = Math.min(maxWidth / width, maxHeight / height);
     width = Math.round(width * ratio);
@@ -57,7 +77,7 @@ export async function convertAndCompressImage(
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, width, height);
   }
-  ctx.drawImage(img, 0, 0, width, height);
+  ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, width, height);
 
   // If PNG, attempt standard toBlob first
   if (format === 'image/png') {
@@ -69,7 +89,7 @@ export async function convertAndCompressImage(
       const nh = Math.round(height * scale);
       canvas.width = nw;
       canvas.height = nh;
-      ctx.drawImage(img, 0, 0, nw, nh);
+      ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, nw, nh);
       blob = await canvasToBlob(canvas, 'image/png');
       scale -= 0.15;
     }
@@ -118,7 +138,7 @@ export async function convertAndCompressImage(
       canvas.height = nh;
       ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(0, 0, nw, nh);
-      ctx.drawImage(img, 0, 0, nw, nh);
+      ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, nw, nh);
       blob = await canvasToBlob(canvas, 'image/jpeg', 0.65);
       scale -= 0.15;
     }

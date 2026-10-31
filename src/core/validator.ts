@@ -162,21 +162,77 @@ export async function validateMediaFile(
       metadata.duration = mp4Info.durationSeconds;
 
       if (mp4Info.isMp4) {
-        const isH264 = !mp4Info.videoCodec || mp4Info.videoCodec === 'avc1';
+        const isH264 = mp4Info.videoCodec === 'avc1';
+        const hasCodec = !!mp4Info.videoCodec;
         items.push({
           id: 'video_codec',
           name: '视频编码 (Video Codec)',
-          status: isH264 ? 'pass' : 'error',
+          status: isH264 ? 'pass' : hasCodec ? 'error' : 'warning',
           message: isH264
-            ? `通过：H.264 编码 (${mp4Info.videoCodec || 'avc1'})`
-            : `❌ 不兼容：检测到 ${mp4Info.videoCodec} 编码，WhatsApp 严格要求 H.264 (AVC1)`,
+            ? `通过：H.264 编码 (${mp4Info.videoCodec})`
+            : hasCodec
+            ? `❌ 不兼容：检测到 ${mp4Info.videoCodec} 编码，WhatsApp 严格要求 H.264 (AVC1)`
+            : `⚠️ 未能解析出视频轨编码格式，建议核对或转码`,
           expected: 'H.264 (avc1)',
-          actual: mp4Info.videoCodec || '未知/已兼容',
+          actual: mp4Info.videoCodec || '未识别',
         });
 
         if (!isH264) {
           availableFixes.push('transcode_video_ffmpeg');
           suggestions.push('当前视频非 H.264 编码，在部分接收端可能无法解码播放，建议一键转码为 H.264。');
+        }
+
+        // H.264 Profile check: Meta recommends Main (no B-frames) or Baseline
+        const isHighWithBframes = mp4Info.h264Profile === 'High' && mp4Info.hasBframes;
+        const profileStatus: CheckStatus = isHighWithBframes
+          ? 'error'
+          : mp4Info.h264Profile === 'High' || (mp4Info.h264Profile === 'Main' && mp4Info.hasBframes)
+          ? 'warning'
+          : 'pass';
+
+        items.push({
+          id: 'video_h264_profile',
+          name: 'H.264 编码规格 (Profile)',
+          status: profileStatus,
+          message: isHighWithBframes
+            ? '❌ Android 不兼容：检测到 H.264 High Profile 且含 B-frames。Meta 官方明确说明 Android WhatsApp 客户端不支持此组合，必须转码为 Main 或 Baseline！'
+            : mp4Info.h264Profile === 'Main' && !mp4Info.hasBframes
+            ? '通过：符合 Meta 官方推荐规格（H.264 Main Profile 无 B-frames）'
+            : mp4Info.h264Profile === 'Baseline'
+            ? '通过：H.264 Baseline Profile，兼容所有设备与客户端'
+            : mp4Info.h264Profile === 'High'
+            ? '⚠️ 兼容性提示：检测到 H.264 High Profile。为确保 Android 客户端最佳兼容，Meta 官方推荐使用 Main (无 B-frames) 或 Baseline。'
+            : mp4Info.h264Profile
+            ? `规格：H.264 ${mp4Info.h264Profile}`
+            : '未知规格 (推荐使用 H.264 Main 或 Baseline)',
+          expected: 'Main (官方推荐无 B-frames) | Baseline',
+          actual: mp4Info.h264Profile ? `H.264 ${mp4Info.h264Profile}${mp4Info.h264Level ? ' Level ' + mp4Info.h264Level : ''}` : '未知',
+          docUrl: 'https://developers.facebook.com/docs/whatsapp/cloud-api/reference/media#video-formatting',
+        });
+
+        // B-frames check (ctts box presence)
+        const bframesStatus: CheckStatus = isHighWithBframes
+          ? 'error'
+          : mp4Info.hasBframes
+          ? 'warning'
+          : 'pass';
+
+        items.push({
+          id: 'video_bframes',
+          name: 'B-frames (双向预测帧检测)',
+          status: bframesStatus,
+          message: isHighWithBframes
+            ? '❌ 严重不兼容：High Profile 包含 B-frames，会导致 Android WhatsApp 用户无法播放。请转码并添加 -bf 0 禁用 B-frames。'
+            : mp4Info.hasBframes
+            ? '⚠️ 包含 B-frames (检测到 ctts atom)：Meta 官方建议使用 -bf 0 禁用 B-frames，避免低端 Android 机型卡顿或黑屏。'
+            : '通过：无 B-frames（未检测到 ctts atom），完全符合 Meta 最佳实践',
+          expected: '无 B-frames (No B-frames)',
+          actual: mp4Info.hasBframes ? '包含 B-frames (存在 ctts)' : '无 B-frames (合规)',
+        });
+
+        if (mp4Info.hasBframes) {
+          availableFixes.push('transcode_video_ffmpeg');
+          suggestions.push('Meta 官方说明：Android WhatsApp 客户端对含 B-frames 视频支持不佳，建议使用转码器移除 B-frames (-bf 0)。');
         }
 
         items.push({
@@ -233,11 +289,33 @@ export async function validateMediaFile(
         suggestions.push('图片大小超过 5 MB，请使用一键智能压缩器降低体积。');
       }
 
-      // Check dimensions
+      // Check dimensions and aspect ratio
       const imgInfo = await inspectImage(file);
       metadata.width = imgInfo.width;
       metadata.height = imgInfo.height;
       metadata.aspectRatio = imgInfo.aspectRatio;
+
+      // Rule: Template Header Image Aspect Ratio must be 3:2 (landscape), 1:1 (square), or 2:3 (portrait)
+      if (imgInfo.width > 0 && imgInfo.height > 0) {
+        const aspectCheck = evaluateHeaderImageAspectRatio(imgInfo.width, imgInfo.height);
+
+        items.push({
+          id: 'header_image_aspect_ratio',
+          name: '模板 Header 图片比例规范',
+          status: aspectCheck.pass ? 'pass' : 'error',
+          message: aspectCheck.pass
+            ? `通过：符合 WhatsApp 模板 Header 规范要求（${aspectCheck.matchedName}，${imgInfo.width}×${imgInfo.height}）`
+            : `❌ 比例不合规：当前比例为 ${(imgInfo.width / imgInfo.height).toFixed(2)}:1 (${imgInfo.width}×${imgInfo.height})。WhatsApp 模板 Header 图片严格要求符合横版 3:2、方形 1:1 或 竖版 2:3 规范。`,
+          expected: '横版 3:2 | 方形 1:1 | 竖版 2:3',
+          actual: aspectCheck.ratioStr,
+          docUrl: FORMAT_DOC_LINKS.RESUMABLE_UPLOAD,
+        });
+
+        if (!aspectCheck.pass) {
+          availableFixes.push('compress_image');
+          suggestions.push('模板 Header 图片需符合横版 3:2、方形 1:1 或 竖版 2:3 规范，可在右侧图片工具中选择预设比例进行框选裁剪。');
+        }
+      }
 
       if (imgInfo.isAnimated) {
         items.push({
@@ -355,32 +433,91 @@ export async function validateMediaFile(
       metadata.duration = mp4Info.durationSeconds;
 
       if (mp4Info.isMp4) {
-        const isH264 = !mp4Info.videoCodec || mp4Info.videoCodec === 'avc1';
+        const isH264 = mp4Info.videoCodec === 'avc1';
+        const hasCodec = !!mp4Info.videoCodec;
         items.push({
           id: 'std_video_codec',
           name: '视频编码检测 (H.264)',
-          status: isH264 ? 'pass' : 'error',
+          status: isH264 ? 'pass' : hasCodec ? 'error' : 'warning',
           message: isH264
-            ? `通过：检测为 H.264 编码 (${mp4Info.videoCodec || 'avc1'})`
-            : `❌ 编码不合规：检测到 ${mp4Info.videoCodec}，官方要求 H.264`,
+            ? `通过：检测为 H.264 编码 (${mp4Info.videoCodec})`
+            : hasCodec
+            ? `❌ 编码不合规：检测到 ${mp4Info.videoCodec}，官方要求 H.264 (avc1)`
+            : `⚠️ 未能解析出视频轨编码格式，建议核对或转码`,
           expected: 'H.264 (avc1)',
-          actual: mp4Info.videoCodec || '未知/已兼容',
+          actual: mp4Info.videoCodec || '未识别',
         });
 
         if (!isH264) {
           availableFixes.push('transcode_video_ffmpeg');
         }
 
-        const isAac = !mp4Info.audioCodec || mp4Info.audioCodec === 'mp4a';
+        // H.264 Profile check: Meta recommends Main (no B-frames) or Baseline
+        const isHighWithBframes = mp4Info.h264Profile === 'High' && mp4Info.hasBframes;
+        const profileStatus: CheckStatus = isHighWithBframes
+          ? 'error'
+          : mp4Info.h264Profile === 'High' || (mp4Info.h264Profile === 'Main' && mp4Info.hasBframes)
+          ? 'warning'
+          : 'pass';
+
+        items.push({
+          id: 'std_video_h264_profile',
+          name: 'H.264 编码规格 (Profile)',
+          status: profileStatus,
+          message: isHighWithBframes
+            ? '❌ Android 不兼容：检测到 H.264 High Profile 且含 B-frames。Meta 官方明确说明 Android WhatsApp 客户端不支持此组合，必须转码为 Main 或 Baseline！'
+            : mp4Info.h264Profile === 'Main' && !mp4Info.hasBframes
+            ? '通过：符合 Meta 官方推荐规格（H.264 Main Profile 无 B-frames）'
+            : mp4Info.h264Profile === 'Baseline'
+            ? '通过：H.264 Baseline Profile，兼容所有设备与客户端'
+            : mp4Info.h264Profile === 'High'
+            ? '⚠️ 兼容性提示：检测到 H.264 High Profile。为确保 Android 客户端最佳兼容，Meta 官方推荐使用 Main (无 B-frames) 或 Baseline。'
+            : mp4Info.h264Profile
+            ? `规格：H.264 ${mp4Info.h264Profile}`
+            : '未知规格 (推荐使用 H.264 Main 或 Baseline)',
+          expected: 'Main (官方推荐无 B-frames) | Baseline',
+          actual: mp4Info.h264Profile ? `H.264 ${mp4Info.h264Profile}${mp4Info.h264Level ? ' Level ' + mp4Info.h264Level : ''}` : '未知',
+          docUrl: 'https://developers.facebook.com/docs/whatsapp/cloud-api/reference/media#video-formatting',
+        });
+
+        // B-frames check (ctts box presence)
+        const bframesStatus: CheckStatus = isHighWithBframes
+          ? 'error'
+          : mp4Info.hasBframes
+          ? 'warning'
+          : 'pass';
+
+        items.push({
+          id: 'std_video_bframes',
+          name: 'B-frames (双向预测帧检测)',
+          status: bframesStatus,
+          message: isHighWithBframes
+            ? '❌ 严重不兼容：High Profile 包含 B-frames，会导致 Android WhatsApp 用户无法播放。请转码并添加 -bf 0 禁用 B-frames。'
+            : mp4Info.hasBframes
+            ? '⚠️ 包含 B-frames (检测到 ctts atom)：Meta 官方建议使用 -bf 0 禁用 B-frames，避免低端 Android 机型卡顿或黑屏。'
+            : '通过：无 B-frames（未检测到 ctts atom），完全符合 Meta 最佳实践',
+          expected: '无 B-frames (No B-frames)',
+          actual: mp4Info.hasBframes ? '包含 B-frames (存在 ctts)' : '无 B-frames (合规)',
+        });
+
+        if (mp4Info.hasBframes) {
+          availableFixes.push('transcode_video_ffmpeg');
+          suggestions.push('Meta 官方说明：Android WhatsApp 客户端对含 B-frames 视频支持不佳，建议使用转码器移除 B-frames (-bf 0)。');
+        }
+
+        const isAac = mp4Info.audioCodec === 'mp4a';
+        const hasAudio = !!mp4Info.audioCodec;
         items.push({
           id: 'std_audio_codec',
           name: '音频轨编码 (AAC)',
-          status: isAac ? 'pass' : 'warning',
+          status: isAac ? 'pass' : hasAudio ? 'warning' : 'pass',
           message: isAac
-            ? `通过：AAC 音频轨 (${mp4Info.audioCodec || 'mp4a'})`
-            : `⚠️ 音频编码为 ${mp4Info.audioCodec}，建议转为 AAC`,
-          expected: 'AAC (mp4a)',
-          actual: mp4Info.audioCodec || '无音轨/正常',
+            ? `通过：AAC 音频轨 (${mp4Info.audioCodec})`
+            : hasAudio
+            ? `⚠️ 音频编码为 ${mp4Info.audioCodec}，建议转为 AAC (mp4a)`
+            : `通过：无音频轨或为静音视频 (WhatsApp 允许单音频轨或无音轨)`,
+          expected: 'AAC (mp4a) 或 无音轨',
+          actual: mp4Info.audioCodec || (mp4Info.audioTracksCount === 0 ? '无音频轨 (合规)' : '未识别'),
         });
 
         items.push({
@@ -589,6 +726,36 @@ function buildResult(
   };
 }
 
+export function evaluateHeaderImageAspectRatio(width: number, height: number): {
+  pass: boolean;
+  matchedName: string | null;
+  ratioStr: string;
+} {
+  if (width <= 0 || height <= 0) {
+    return { pass: true, matchedName: null, ratioStr: '0:0' };
+  }
+  const ratio = width / height;
+  let matchedName: string | null = null;
+
+  // Meta WhatsApp Template Header aspect ratio specifications:
+  // 横版 3:2 (1.5), 方形 1:1 (1.0), 竖版 2:3 (0.667)
+  if (Math.abs(ratio - 1.5) <= 0.05) {
+    matchedName = '横版 3:2';
+  } else if (Math.abs(ratio - 1.0) <= 0.04) {
+    matchedName = '方形 1:1';
+  } else if (Math.abs(ratio - 2 / 3) <= 0.04) {
+    matchedName = '竖版 2:3';
+  }
+
+  return {
+    pass: matchedName !== null,
+    matchedName,
+    ratioStr: matchedName
+      ? `${width} × ${height} (${matchedName})`
+      : `${width} × ${height} (${ratio.toFixed(2)}:1)`,
+  };
+}
+
 function isMimeMatchingExt(mime: string, ext: string): boolean {
   if (!ext) return true;
   if (['jpg', 'jpeg'].includes(ext) && mime === 'image/jpeg') return true;
@@ -596,7 +763,7 @@ function isMimeMatchingExt(mime: string, ext: string): boolean {
   if (ext === 'webp' && mime === 'image/webp') return true;
   if (ext === 'gif' && mime === 'image/gif') return true;
   if (ext === 'pdf' && mime === 'application/pdf') return true;
-  if (ext === 'mp4' && mime === 'video/mp4') return true;
+  if (['mp4', 'm4v', 'mov', 'qt'].includes(ext) && (mime === 'video/mp4' || mime === 'video/quicktime')) return true;
   if (['3gp', '3gpp'].includes(ext) && (mime === 'video/3gp' || mime === 'video/3gpp')) return true;
   if (ext === 'mp3' && mime === 'audio/mpeg') return true;
   if (ext === 'm4a' && mime === 'audio/mp4') return true;
