@@ -1,6 +1,6 @@
 {
-  "lastSyncedAt": "2026-11-16T08:50:50.782Z",
-  "totalCount": 416,
+  "lastSyncedAt": "2026-11-23T10:03:56.599Z",
+  "totalCount": 417,
   "sourceUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes + https://developers.facebook.com/docs/graph-api/reference/whats-app-business-account/",
   "items": [
     {
@@ -785,15 +785,19 @@
       "titleZh": "达到单用户营销模板消息推送上限",
       "detailsEn": "This message was not delivered to maintain healthy ecosystem engagement.",
       "detailsZh": "为保护生态体验，Meta 限制了向单个 WhatsApp 用户连续推送营销模板的频次。",
-      "solutionEn": "If you do receive this error code and suspect it is due to the limit, wait at least 24 hours before resending the template message. Doing so will only result in another error response since the limit may be in effect for differing periods of time.See [Per-User Marketing Template Message Limits](https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/marketing-templates/per-user-limits) for additional information.",
+      "solutionEn": "The marketing message was not delivered at this time to support a healthy messaging experience. Try sending at a later time. Retrying does not guarantee delivery.See [Per-user marketing template message limits](https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/marketing-templates/per-user-limits) for additional information.Starting February 2027, [131066](https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes#marketing-messages-api-for-whatsapp-error-codes) will be returned instead of 131049 when marketing messages are not delivered to a user due to template quality or, for max price templates, price. 131049 will continue to indicate that a message was not delivered to support a healthy messaging experience.",
       "solutionZh": "请至少等待 24 小时后再向该用户重试发送营销模板，或改用实用通知型（Utility）模板。",
       "severity": "client_error",
       "httpStatus": 400,
       "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
       "relatedLinks": [
         {
-          "title": "Per-User Marketing Template Message Limits",
+          "title": "Per-user marketing template message limits",
           "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/templates/marketing-templates/per-user-limits"
+        },
+        {
+          "title": "131066",
+          "url": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes#marketing-messages-api-for-whatsapp-error-codes"
         }
       ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Per-User Marketing Template Message Limit Reached\",\n    \"type\": \"OAuthException\",\n    \"code\": 131049,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"This message was not delivered to maintain healthy ecosystem engagement.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
@@ -990,6 +994,23 @@
         }
       ],
       "examplePayload": "{\n  \"error\": {\n    \"message\": \"Restricted Messaging Tier\",\n    \"type\": \"OAuthException\",\n    \"code\": 131064,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"Message failed to send because this account has reached its messaging limit due to template classifi\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
+    },
+    {
+      "code": 131066,
+      "provider": "meta",
+      "providerNameZh": "Meta WhatsApp 官方",
+      "category": "messaging",
+      "categoryNameZh": "消息发送与接收",
+      "titleEn": "Error 131066",
+      "titleZh": "错误码 131066",
+      "detailsEn": "(#131066) Message was not delivered to this user.",
+      "detailsZh": "(#131066) Message was not delivered to this user.",
+      "solutionEn": "You can improve your chances on future sends by raising template quality (reads, clicks, and other user responses) or, for max price templates, increasing your price. Changes do not guarantee delivery.",
+      "solutionZh": "You can improve your chances on future sends by raising template quality (reads, clicks, and other user responses) or, for max price templates, increasing your price. Changes do not guarantee delivery.",
+      "severity": "client_error",
+      "httpStatus": 400,
+      "docUrl": "https://developers.facebook.com/documentation/business-messaging/whatsapp/support/error-codes",
+      "examplePayload": "{\n  \"error\": {\n    \"message\": \"Error 131066\",\n    \"type\": \"OAuthException\",\n    \"code\": 131066,\n    \"error_data\": {\n      \"messaging_product\": \"whatsapp\",\n      \"details\": \"(#131066) Message was not delivered to this user.\"\n    },\n    \"fbtrace_id\": \"AbCdEf123456XyZ\"\n  }\n}"
     },
     {
       "code": 132000,
